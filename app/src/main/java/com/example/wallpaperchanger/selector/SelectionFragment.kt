@@ -24,8 +24,8 @@ class SelectionFragment : Fragment() {
         binding.viewModel = viewModel
         binding.selectionList.adapter = Adapter()
 
-        viewModel.loadedCount.observe(viewLifecycleOwner) {
-            if (it == viewModel.listSize) {
+        viewModel.count.observe(viewLifecycleOwner) {
+            if (it == viewModel.listSize.value) {
                 viewModel.toggleVisibility()
             }
         }

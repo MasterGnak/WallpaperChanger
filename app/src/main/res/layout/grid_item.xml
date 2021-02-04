@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
     <data>
         <variable name="image" type="com.example.wallpaperchanger.network.Wallpaper"/>
     </data>
-    <ImageView
-            android:id="@+id/item_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:image="@{image}"/>
+
+        <ImageView
+                android:id="@+id/item_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                app:image="@{image}"
+                android:background="@drawable/item_background"
+                android:paddingTop="@dimen/tiny"
+                android:paddingBottom="@dimen/tiny"/>
 
 </layout>
