@@ -12,7 +12,7 @@
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
                 app:image="@{image}"
-                android:background="@drawable/item_background"
+                android:background="@color/primaryColor"
                 android:paddingTop="@dimen/tiny"
                 android:paddingBottom="@dimen/tiny"/>
 

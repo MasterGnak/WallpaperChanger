@@ -25,6 +25,14 @@ class SelectionViewModel(application: Application) : AndroidViewModel(applicatio
         _hidden.value = !_hidden.value!!
     }
 
+    private val _menuOpened = MutableLiveData(false)
+    val menuOpened: LiveData<Boolean>
+        get() = _menuOpened
+
+    fun toggleMenu() {
+        _menuOpened.value = !_menuOpened.value!!
+    }
+
     init {
 //        if (images.value.isNullOrEmpty()) {
 //            viewModelScope.launch {

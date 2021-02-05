@@ -1,15 +1,19 @@
 package com.example.wallpaperchanger.selector
 
+import android.graphics.Bitmap
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.graphics.drawable.toBitmap
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wallpaperchanger.databinding.GridItemBinding
 import com.example.wallpaperchanger.network.Wallpaper
+import kotlinx.android.synthetic.main.grid_item.view.*
 
-class Adapter(): ListAdapter<Wallpaper, Adapter.ViewHolder>(DiffCallback) {
+class Adapter(val clickListener: ClickListener): ListAdapter<Wallpaper, Adapter.ViewHolder>(DiffCallback) {
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder.from(parent)
@@ -18,6 +22,11 @@ class Adapter(): ListAdapter<Wallpaper, Adapter.ViewHolder>(DiffCallback) {
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val image = getItem(position)
         holder.bind(image)
+        holder.itemView.setOnClickListener{
+            if (holder.itemView.item_image.drawable != null) {
+                clickListener.onClick(holder.itemView.item_image.drawable.toBitmap())
+            }
+        }
     }
 
     class ViewHolder private constructor(private val binding: GridItemBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -34,6 +43,11 @@ class Adapter(): ListAdapter<Wallpaper, Adapter.ViewHolder>(DiffCallback) {
         }
 
 
+    }
+
+    class ClickListener(val onClickListener: (bm: Bitmap) -> Unit) {
+        //fun onClick(wp: Wallpaper) = onClickListener(wp)
+        fun onClick(bitmap: Bitmap) = onClickListener(bitmap)
     }
 
     companion object DiffCallback: DiffUtil.ItemCallback<Wallpaper>() {
