@@ -54,6 +54,7 @@ class SelectionFragment : Fragment() {
         }
 
         viewModel.count.observe(viewLifecycleOwner) {
+            binding.progressHorizontal.progress = it
             if (it == viewModel.listSize.value) {
                 viewModel.toggleVisibility()
             }

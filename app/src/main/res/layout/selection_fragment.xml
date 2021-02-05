@@ -5,34 +5,48 @@
     <data>
         <variable name="viewModel" type="com.example.wallpaperchanger.selector.SelectionViewModel"/>
     </data>
-    <androidx.coordinatorlayout.widget.CoordinatorLayout android:layout_width="match_parent"
-                                                         android:layout_height="match_parent">
-            <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:id="@+id/validation_image"
-                    android:src="@drawable/loading_animation"
-                    app:visible="@{viewModel.hidden}"
-                    android:background="@color/primaryColor"
-            />
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/primaryColor"
+    >
+        <!--        <ImageView-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="match_parent"-->
+        <!--                android:id="@+id/validation_image"-->
+        <!--                android:src="@drawable/loading_animation"-->
+        <!--                app:visible="@{viewModel.hidden}"-->
+        <!--                android:background="@color/primaryColor"-->
+        <!--        />-->
 
-            <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/selection_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    app:imageList="@{viewModel.images}"
-                    app:visible="@{viewModel.hidden}"
-                    app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
-            />
+        <ProgressBar
+                android:id="@+id/progress_horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                style="@android:style/Widget.Holo.ProgressBar.Horizontal"
+                app:visible="@{viewModel.hidden}"
+                android:max="35"
+                android:progressTint="@color/secondaryColor"
+        />
 
-            <include layout="@layout/selection_menu_slide"
-                     android:id="@+id/bottomMenu"
-                     android:layout_width="match_parent"
-                     android:layout_height="wrap_content"
-                     android:layout_gravity="bottom"
-                     android:layout_marginBottom="@dimen/menu_margin"
-                     />
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/selection_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:imageList="@{viewModel.images}"
+                app:visible="@{viewModel.hidden}"
+                app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+        />
+
+        <include layout="@layout/selection_menu_slide"
+                 android:id="@+id/bottomMenu"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_gravity="bottom"
+                 android:layout_marginBottom="@dimen/menu_margin"
+        />
 
         <com.google.android.material.appbar.AppBarLayout
                 android:id="@+id/app_bar"

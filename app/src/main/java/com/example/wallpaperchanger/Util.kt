@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.ProgressBar
 import androidx.core.net.toUri
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -79,6 +80,15 @@ fun visibleAnim(imageView: ImageView, hidden: Boolean) {
         imageView.visibility = View.GONE
     } else {
         imageView.visibility = View.VISIBLE
+    }
+}
+
+@BindingAdapter("visible")
+fun visibleAnim(progressBar: ProgressBar, hidden: Boolean) {
+    if (!hidden) {
+        progressBar.visibility = View.GONE
+    } else {
+        progressBar.visibility = View.VISIBLE
     }
 }
 
