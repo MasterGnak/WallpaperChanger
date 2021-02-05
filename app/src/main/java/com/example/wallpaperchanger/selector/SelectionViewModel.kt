@@ -29,8 +29,20 @@ class SelectionViewModel(application: Application) : AndroidViewModel(applicatio
     val menuOpened: LiveData<Boolean>
         get() = _menuOpened
 
-    fun toggleMenu() {
-        _menuOpened.value = !_menuOpened.value!!
+    fun showMenu() {
+        _menuOpened.value = true
+    }
+
+    fun hideMenu() {
+        _menuOpened.value = false
+    }
+
+    fun downloadWp(query: String) {
+        viewModelScope.launch {
+            toggleVisibility()
+            clear()
+            repository.downloadWallpapers(query)
+        }
     }
 
     init {

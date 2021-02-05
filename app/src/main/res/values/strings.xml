@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">WallpaperChanger</string>
     <string name="set_as_wp">Установить как обои</string>
+    <string name="ready">Готово</string>
+    <string name="query_hint">Поиск...</string>
 </resources>

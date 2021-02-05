@@ -65,8 +65,8 @@ class Repository(private val database: ImageDatabase, private val context: Conte
         }
     }
 
-    suspend fun downloadWallpapers() {
-        val wallpapers = Api.retrofitService.getImages("Phone wallpaper", "Wallpaper", "Tall")
+    suspend fun downloadWallpapers(query: String) {
+        val wallpapers = Api.retrofitService.getImages(query, "Wallpaper", "Tall")
         listSize.value = wallpapers.size
         for (wp in wallpapers) {
             wp.validate(context)

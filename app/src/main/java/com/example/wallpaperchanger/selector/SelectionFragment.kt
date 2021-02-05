@@ -1,6 +1,7 @@
 package com.example.wallpaperchanger.selector
 
 import android.animation.ObjectAnimator
+import android.app.Activity
 import android.app.WallpaperManager
 import android.os.Bundle
 import android.util.Log
@@ -9,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import com.example.wallpaperchanger.R
@@ -28,19 +30,26 @@ class SelectionFragment : Fragment() {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
         val wpManager = WallpaperManager.getInstance(context)
+        val showM = ObjectAnimator.ofFloat(binding.bottomMenu.root, "translationY", -100f).apply { duration = 500 }
+        val hideM = ObjectAnimator.ofFloat(binding.bottomMenu.root, "translationY", 100f).apply { duration = 500 }
+        val imm = requireNotNull(activity).getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+
         binding.selectionList.adapter = Adapter(Adapter.ClickListener {
             if (viewModel.menuOpened.value == false) {
-                binding.testView.bitmap = it
-                showMenu()
+                binding.bottomMenu.bitmap = it
+                showM.start()
+                viewModel.showMenu()
             } else if (viewModel.menuOpened.value == true) {
-                hideMenu()
-                binding.testView.bitmap = null
+                hideM.start()
+                viewModel.hideMenu()
+                binding.bottomMenu.bitmap = null
             }
         })
 
-        binding.testView.root.setOnClickListener{
-            hideMenu()
-            wpManager.setBitmap(binding.testView.bitmap)
+        binding.bottomMenu.root.setOnClickListener{
+            hideM.start()
+            viewModel.showMenu()
+            wpManager.setBitmap(binding.bottomMenu.bitmap)
             Toast.makeText(context, "Обои обновлены", Toast.LENGTH_SHORT).show()
         }
 
@@ -50,23 +59,22 @@ class SelectionFragment : Fragment() {
             }
         }
 
+        binding.editQuery.setOnFocusChangeListener{editText: View, focused: Boolean ->
+            if (focused) {
+                binding.confirmQuery.visibility = View.VISIBLE
+            } else {
+                binding.confirmQuery.visibility = View.GONE
+            }
+        }
+
+        binding.confirmQuery.setOnClickListener{
+            binding.editQuery.clearFocus()
+            imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
+            viewModel.downloadWp(binding.editQuery.text.toString())
+        }
+
+
         return binding.root
-    }
-
-    private fun showMenu() {
-        ObjectAnimator.ofFloat(binding.testView.root, "translationY", -100f).apply {
-            duration = 500
-            start()
-        }
-        viewModel.toggleMenu()
-    }
-
-    private fun hideMenu() {
-        ObjectAnimator.ofFloat(binding.testView.root, "translationY", 100f).apply {
-            duration = 500
-            start()
-        }
-        viewModel.toggleMenu()
     }
 
 }

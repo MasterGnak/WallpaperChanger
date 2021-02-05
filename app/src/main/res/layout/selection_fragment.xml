@@ -5,40 +5,80 @@
     <data>
         <variable name="viewModel" type="com.example.wallpaperchanger.selector.SelectionViewModel"/>
     </data>
-    <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:context=".selector.SelectionFragment">
+    <androidx.coordinatorlayout.widget.CoordinatorLayout android:layout_width="match_parent"
+                                                         android:layout_height="match_parent">
+            <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/validation_image"
+                    android:src="@drawable/loading_animation"
+                    app:visible="@{viewModel.hidden}"
+                    android:background="@color/primaryColor"
+            />
 
-        <ImageView
+            <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/selection_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:imageList="@{viewModel.images}"
+                    app:visible="@{viewModel.hidden}"
+                    app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+            />
+
+            <include layout="@layout/selection_menu_slide"
+                     android:id="@+id/bottomMenu"
+                     android:layout_width="match_parent"
+                     android:layout_height="wrap_content"
+                     android:layout_gravity="bottom"
+                     android:layout_marginBottom="@dimen/menu_margin"
+                     />
+
+        <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/app_bar"
+                android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/validation_image"
-                android:src="@drawable/loading_animation"
-                app:visible="@{viewModel.hidden}"
-                />
+                android:layout_height="wrap_content">
 
-        <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/selection_list"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:imageList="@{viewModel.images}"
-                app:visible="@{viewModel.hidden}"
-                />
+            <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="?attr/colorPrimary"
+                    android:elevation="4dp"
+                    android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                    app:layout_scrollFlags="scroll|enterAlways">
+                <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                    <EditText
+                            android:id="@+id/edit_query"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:background="@null"
+                            android:textColor="@color/secondaryColor"
+                            android:hint="@string/query_hint"
+                            android:textColorHint="@color/secondaryTextColor"
+                            app:layout_constraintEnd_toStartOf="@+id/confirm_query"
+                            app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent" android:layout_marginEnd="8dp"/>
+                    <TextView
+                            android:id="@+id/confirm_query"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:text="@string/ready"
+                            android:gravity="center"
+                            android:visibility="gone"
+                            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" android:layout_marginEnd="16dp"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <include layout="@layout/selection_menu_slide"
-                android:id="@+id/testView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"/>
+            </androidx.appcompat.widget.Toolbar>
+
+        </com.google.android.material.appbar.AppBarLayout>
 
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
 </layout>
