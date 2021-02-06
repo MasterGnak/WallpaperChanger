@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.core.net.toUri
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.bumptech.glide.Glide
@@ -20,19 +22,41 @@ import kotlinx.coroutines.withContext
 
 class Repository(private val database: ImageDatabase, private val context: Context) {
 
-    val images = Transformations.map(database.imageDao.getAll()) {
+
+    private var databaseSource = true
+
+    val images = MediatorLiveData<List<Wallpaper>>()
+
+    private val databaseImages = Transformations.map(database.imageDao.getAll()) {
         it.asWallpaper()
     }
+
+    private val downloadedImages = MutableLiveData<MutableList<Wallpaper>>(mutableListOf())
 
     var listSize = MutableLiveData(-1)
 
     var count = MutableLiveData(0)
 
+    init {
+        images.addSource(databaseImages) { images.value = it }
+    }
 
 
-    fun increment() {
+    fun increment(wp: Wallpaper?) {
         MainScope().launch {
             count.value = count.value?.plus(1)
+            if (wp != null) {
+                downloadedImages.value!!.add(wp)
+//                withContext(Dispatchers.IO) {
+//                    database.imageDao.insertOne(wp)
+//                }
+            }
+        }
+    }
+
+    suspend fun insertWp() {
+        withContext(Dispatchers.IO) {
+            database.imageDao.insertAll(downloadedImages.value!!.asEntityWps())
         }
     }
 
@@ -46,7 +70,7 @@ class Repository(private val database: ImageDatabase, private val context: Conte
                     target: Target<Drawable>?,
                     isFirstResource: Boolean
                 ): Boolean {
-                    increment()
+                    increment(null)
                     return false
                 }
 
@@ -57,8 +81,7 @@ class Repository(private val database: ImageDatabase, private val context: Conte
                     dataSource: DataSource?,
                     isFirstResource: Boolean
                 ): Boolean {
-                    database.imageDao.insertOne(this@validate.asEntityWallpaper())
-                    increment()
+                    increment(this@validate.asWallpaper())
                     return false
                 }
             }).submit()
@@ -66,7 +89,13 @@ class Repository(private val database: ImageDatabase, private val context: Conte
     }
 
     suspend fun downloadWallpapers(query: String) {
-        val wallpapers = Api.retrofitService.getImages(query, "Wallpaper", "Tall")
+        downloadedImages.value = mutableListOf()
+        val wallpapers = Api.retrofitService.getImages(query, "Wallpaper", "Tall", 100)
+        if (databaseSource) {
+            images.removeSource(databaseImages)
+            images.addSource(downloadedImages) {images.value = it}
+            databaseSource = false
+        }
         listSize.value = wallpapers.size
         for (wp in wallpapers) {
             wp.validate(context)

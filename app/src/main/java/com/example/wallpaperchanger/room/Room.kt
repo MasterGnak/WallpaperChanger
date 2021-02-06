@@ -21,6 +21,9 @@ interface ImageDao {
 
     @Query("SELECT * FROM wallpaper_table")
     fun getAll(): LiveData<List<EntityWallpaper>>
+
+    @Query("SELECT count(*) FROM wallpaper_table")
+    fun getCount(): Int
 }
 
 @Database(entities = [EntityWallpaper::class], version = 3)

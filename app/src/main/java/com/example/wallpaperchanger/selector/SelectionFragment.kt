@@ -15,6 +15,10 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import com.example.wallpaperchanger.R
 import com.example.wallpaperchanger.databinding.SelectionFragmentBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SelectionFragment : Fragment() {
 
@@ -47,16 +51,21 @@ class SelectionFragment : Fragment() {
         })
 
         binding.bottomMenu.root.setOnClickListener{
-            hideM.start()
-            viewModel.showMenu()
-            wpManager.setBitmap(binding.bottomMenu.bitmap)
-            Toast.makeText(context, "Обои обновлены", Toast.LENGTH_SHORT).show()
+            MainScope().launch {
+                hideM.start()
+                viewModel.hideMenu()
+                Toast.makeText(context, "Обои обновлены", Toast.LENGTH_SHORT).show()
+                withContext(Dispatchers.Default) {
+                    wpManager.setBitmap(binding.bottomMenu.bitmap)
+                }
+            }
         }
 
         viewModel.count.observe(viewLifecycleOwner) {
             binding.progressHorizontal.progress = it
             if (it == viewModel.listSize.value) {
                 viewModel.toggleVisibility()
+                viewModel.resetCount()
             }
         }
 

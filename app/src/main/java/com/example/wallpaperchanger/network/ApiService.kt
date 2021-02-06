@@ -23,9 +23,12 @@ private val retrofit = Retrofit.Builder()
 interface ApiService {
     @Headers("Ocp-Apim-Subscription-Key:db6bc20543ef4a9f914fb7bfe39bd1eb")
     @GET("v7.0/images/search")
-    suspend fun getImages(@Query("q") searchRequest: String,
-                          @Query("size") size: String,
-                          @Query("aspect") aspect: String): List<NetworkWallpaper>
+    suspend fun getImages(
+        @Query("q") searchRequest: String,
+        @Query("size") size: String,
+        @Query("aspect") aspect: String,
+        @Query("count") count: Short
+    ): List<NetworkWallpaper>
 }
 
 object Api {

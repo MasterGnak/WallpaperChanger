@@ -26,7 +26,7 @@
                 android:layout_gravity="center"
                 style="@android:style/Widget.Holo.ProgressBar.Horizontal"
                 app:visible="@{viewModel.hidden}"
-                android:max="35"
+                android:max="100"
                 android:progressTint="@color/secondaryColor"
         />
 

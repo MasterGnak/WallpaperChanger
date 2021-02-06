@@ -72,6 +72,22 @@ fun NetworkWallpaper.asEntityWallpaper(): EntityWallpaper {
 }
 
 
+fun NetworkWallpaper.asWallpaper(): Wallpaper {
+    return Wallpaper(
+        imageId = this.imageId,
+        contentUrl = this.contentUrl
+    )
+}
+
+fun MutableList<Wallpaper>.asEntityWps(): List<EntityWallpaper> {
+    return this.map {
+        EntityWallpaper(
+            imageId = it.imageId,
+            contentUrl = it.contentUrl
+        )
+    }
+}
+
 
 class WallpaperJsonAdapter {
 

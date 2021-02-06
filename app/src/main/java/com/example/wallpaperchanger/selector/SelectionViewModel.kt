@@ -25,6 +25,13 @@ class SelectionViewModel(application: Application) : AndroidViewModel(applicatio
         _hidden.value = !_hidden.value!!
     }
 
+    fun resetCount() {
+        count.value = 0
+        viewModelScope.launch {
+            repository.insertWp()
+        }
+    }
+
     private val _menuOpened = MutableLiveData(false)
     val menuOpened: LiveData<Boolean>
         get() = _menuOpened
