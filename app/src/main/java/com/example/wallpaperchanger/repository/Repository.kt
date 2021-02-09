@@ -3,6 +3,7 @@ package com.example.wallpaperchanger.repository
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.Log
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
@@ -62,31 +63,37 @@ class Repository(private val database: ImageDatabase, private val context: Conte
         }
     }
 
-    suspend fun NetworkWallpaper.validate(context: Context) {
+    suspend fun NetworkWallpaper._validate(context: Context) {
         withContext(Dispatchers.IO) {
-            val imgUri = this@validate.contentUrl.toUri().buildUpon().scheme("https").build()
-            val img = Glide.with(context).load(imgUri).listener(object : RequestListener<Drawable> {
-                override fun onLoadFailed(
-                    e: GlideException?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    increment(null)
-                    return false
+            val imgUri = this@_validate.contentUrl.toUri().buildUpon().scheme("https").build()
+
+        }
+    }
+
+    fun List<NetworkWallpaper>.validate(context: Context): List<EntityWallpaper> {
+
+        return map {
+            val imgUri = it.contentUrl.toUri().buildUpon().scheme("https").build()
+            val img = Glide.with(context).load(imgUri).into(object: CustomTarget<Drawable>() {
+
+                override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                    val bitmap = resource.toBitmap()
+
                 }
 
-                override fun onResourceReady(
-                    resource: Drawable?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    dataSource: DataSource?,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    increment(this@validate.asWallpaper())
-                    return false
+                override fun onLoadCleared(placeholder: Drawable?) {
+
                 }
-            }).submit()
+
+                override fun onLoadFailed(errorDrawable: Drawable?) {
+
+                }
+            })
+
+            EntityWallpaper(
+                imageId = it.imageId,
+
+            )
         }
     }
 
@@ -100,18 +107,7 @@ class Repository(private val database: ImageDatabase, private val context: Conte
         }
         listSize.value = wallpapers.size
         for (wp in wallpapers) {
-            wp.validate(context)
+            wp._validate(context)
         }
-    }
-}
-
-class WpTarget: CustomTarget<Drawable>() {
-
-    override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onLoadCleared(placeholder: Drawable?) {
-        TODO("Not yet implemented")
     }
 }

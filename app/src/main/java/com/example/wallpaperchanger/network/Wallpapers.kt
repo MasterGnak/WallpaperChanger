@@ -43,7 +43,8 @@ data class EntityWallpaper(
     val imageId: String,
 
     @ColumnInfo
-    val contentUrl: String
+    val path: String,
+
 )
 
 fun List<NetworkWallpaper>.asEntityWallpapers(): List<EntityWallpaper> {
