@@ -29,7 +29,7 @@ class CollectionFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(CollectionViewModel::class.java)
         binding.viewModel = viewModel
 
-        binding.collectionList.adapter = Adapter(Adapter.ClickListener{})
+        binding.collectionList.adapter = Adapter()
 
 
         return binding.root

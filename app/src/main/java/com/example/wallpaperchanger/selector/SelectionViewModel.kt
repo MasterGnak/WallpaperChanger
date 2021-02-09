@@ -1,12 +1,15 @@
 package com.example.wallpaperchanger.selector
 
 import android.app.Application
+
 import androidx.lifecycle.*
 import com.example.wallpaperchanger.repository.Repository
 import com.example.wallpaperchanger.room.getDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.apache.commons.io.FileUtils
+import java.io.File
 
 class SelectionViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -20,6 +23,7 @@ class SelectionViewModel(application: Application) : AndroidViewModel(applicatio
     val images = repository.images
     val listSize = repository.listSize
     val count = repository.count
+    val dirPath = repository.dirPath
 
     fun toggleVisibility() {
         _hidden.value = !_hidden.value!!
@@ -27,9 +31,6 @@ class SelectionViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun resetCount() {
         count.value = 0
-        viewModelScope.launch {
-            repository.insertWp()
-        }
     }
 
     private val _menuOpened = MutableLiveData(false)
@@ -65,6 +66,7 @@ class SelectionViewModel(application: Application) : AndroidViewModel(applicatio
 
     private suspend fun clear() {
         withContext(Dispatchers.IO) {
+            FileUtils.deleteDirectory(File(dirPath))
             database.imageDao.clear()
         }
     }

@@ -43,31 +43,31 @@ class SelectionFragment : Fragment() {
 
         val adapter = Adapter()
 
-        val selector = SelectionTracker.Builder(
-            "selector",
-            binding.selectionList,
-            Adapter.KeyProvider(adapter),
-            Adapter.DetailsLookup(binding.selectionList),
-            StorageStrategy.createLongStorage()
-        ).build()
-
-        selector.addObserver(object: SelectionTracker.SelectionObserver<Long>() {
-
-        })
-
-        adapter.setClickListener(Adapter.ClickListener {
-            binding.editQuery.clearFocus()
-            imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
-            if (viewModel.menuOpened.value == false) {
-                binding.bottomMenu.bitmap = it
-                showM.start()
-                viewModel.showMenu()
-            } else if (viewModel.menuOpened.value == true) {
-                hideM.start()
-                viewModel.hideMenu()
-                binding.bottomMenu.bitmap = null
-            }
-        })
+//        val selector = SelectionTracker.Builder(
+//            "selector",
+//            binding.selectionList,
+//            Adapter.KeyProvider(adapter),
+//            Adapter.DetailsLookup(binding.selectionList),
+//            StorageStrategy.createLongStorage()
+//        ).build()
+//
+//        selector.addObserver(object: SelectionTracker.SelectionObserver<Long>() {
+//
+//        })
+//
+//        adapter.setClickListener(Adapter.ClickListener {
+//            binding.editQuery.clearFocus()
+//            imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
+//            if (viewModel.menuOpened.value == false) {
+//                binding.bottomMenu.bitmap = it
+//                showM.start()
+//                viewModel.showMenu()
+//            } else if (viewModel.menuOpened.value == true) {
+//                hideM.start()
+//                viewModel.hideMenu()
+//                binding.bottomMenu.bitmap = null
+//            }
+//        })
 
         binding.selectionList.adapter = adapter
 

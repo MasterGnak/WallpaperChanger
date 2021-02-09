@@ -26,7 +26,7 @@ interface ImageDao {
     fun getCount(): Int
 }
 
-@Database(entities = [EntityWallpaper::class], version = 3)
+@Database(entities = [EntityWallpaper::class], version = 1)
 abstract class ImageDatabase: RoomDatabase() {
     abstract val imageDao: ImageDao
 }

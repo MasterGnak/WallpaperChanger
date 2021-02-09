@@ -21,35 +21,8 @@ import com.example.wallpaperchanger.network.Wallpaper
 @BindingAdapter("image")
 fun bindImage(imgView: ImageView, image: Wallpaper?) {
     image?.let {
-        if (it.loaded != false) {
-            val imgUri = image.contentUrl.toUri().buildUpon().scheme("https").build()
-            Glide.with(imgView.context)
-                .load(imgUri)
-                .listener(object: RequestListener<Drawable> {
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        Log.e("loading", "load failed", e)
-                        image.loaded = false
-                        return false
-                    }
-
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        return false
-                    }
-
-                })
-                .apply(RequestOptions())
-                .into(imgView)
+        if (it.bitmap != null) {
+            imgView.setImageBitmap(it.bitmap)
         }
     }
 }
@@ -67,15 +40,6 @@ fun visible(recyclerView: RecyclerView, hidden: Boolean) {
         recyclerView.visibility = View.GONE
     } else {
         recyclerView.visibility = View.VISIBLE
-    }
-}
-
-@BindingAdapter("visible")
-fun visibleAnim(imageView: ImageView, hidden: Boolean) {
-    if (!hidden) {
-        imageView.visibility = View.GONE
-    } else {
-        imageView.visibility = View.VISIBLE
     }
 }
 

@@ -2,6 +2,8 @@ package com.example.wallpaperchanger.network
 
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.core.net.toUri
@@ -31,11 +33,8 @@ data class NetworkWallpaper (
 
 data class Wallpaper (
     val imageId: String,
-    val contentUrl: String
-        ) {
-    var loaded: Boolean? = null
-}
-
+    val bitmap: Bitmap? = null
+    )
 
 @Entity(tableName = "wallpaper_table")
 data class EntityWallpaper(
@@ -47,45 +46,19 @@ data class EntityWallpaper(
 
 )
 
-fun List<NetworkWallpaper>.asEntityWallpapers(): List<EntityWallpaper> {
+fun List<EntityWallpaper>.asWallpapers(): List<Wallpaper> {
     return map {
-        EntityWallpaper (
-            imageId = it.imageId,
-            contentUrl = it.contentUrl
-                )
-    }
-}
-
-fun List<EntityWallpaper>.asWallpaper(): List<Wallpaper> {
-    return this.map {
-        Wallpaper(
-            imageId = it.imageId,
-            contentUrl = it.contentUrl
-        )
-    }
-}
-
-fun NetworkWallpaper.asEntityWallpaper(): EntityWallpaper {
-    return EntityWallpaper (
-        imageId = this.imageId,
-        contentUrl = this.contentUrl
-    )
-}
-
-
-fun NetworkWallpaper.asWallpaper(): Wallpaper {
-    return Wallpaper(
-        imageId = this.imageId,
-        contentUrl = this.contentUrl
-    )
-}
-
-fun MutableList<Wallpaper>.asEntityWps(): List<EntityWallpaper> {
-    return this.map {
-        EntityWallpaper(
-            imageId = it.imageId,
-            contentUrl = it.contentUrl
-        )
+        val bitmap = BitmapFactory.decodeFile(it.path)
+        if (bitmap != null) {
+            Wallpaper(
+                imageId = it.imageId,
+                bitmap = bitmap
+            )
+        } else {
+            Wallpaper(
+                imageId = it.imageId,
+            )
+        }
     }
 }
 

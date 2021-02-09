@@ -1,7 +1,10 @@
 package com.example.wallpaperchanger.repository
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.net.Uri
+import android.os.Environment
 import android.util.Log
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
@@ -16,22 +19,26 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
+import com.example.wallpaperchanger.R
 import com.example.wallpaperchanger.network.*
 import com.example.wallpaperchanger.room.ImageDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+import java.lang.Exception
 
 class Repository(private val database: ImageDatabase, private val context: Context) {
 
 
     private var databaseSource = true
 
-    val images = MediatorLiveData<List<Wallpaper>>()
+    //val images = MediatorLiveData<List<Wallpaper>>()
 
-    private val databaseImages = Transformations.map(database.imageDao.getAll()) {
-        it.asWallpaper()
+    val images = Transformations.map(database.imageDao.getAll()) {
+        it.asWallpapers()
     }
 
     private val downloadedImages = MutableLiveData<MutableList<Wallpaper>>(mutableListOf())
@@ -40,28 +47,32 @@ class Repository(private val database: ImageDatabase, private val context: Conte
 
     var count = MutableLiveData(0)
 
+    val dirPath = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)?.absolutePath + "/" + context.getString(R.string.app_name) + "/"
+    private val dir = File(dirPath)
+    private var dirCreated = false
+
     init {
-        images.addSource(databaseImages) { images.value = it }
+        Log.i("loading", "path is $dirPath, dir exists: ${dir.exists()}")
+        //images.addSource(databaseImages) { images.value = it }
     }
 
 
-    fun increment(wp: Wallpaper?) {
+    fun increment(vararg id: String) {
         MainScope().launch {
             count.value = count.value?.plus(1)
-            if (wp != null) {
-                downloadedImages.value!!.add(wp)
-//                withContext(Dispatchers.IO) {
-//                    database.imageDao.insertOne(wp)
-//                }
+            if (id.isNotEmpty()) {
+                withContext(Dispatchers.IO) {
+                    database.imageDao.remove(id[0])
+                }
             }
         }
     }
 
-    suspend fun insertWp() {
-        withContext(Dispatchers.IO) {
-            database.imageDao.insertAll(downloadedImages.value!!.asEntityWps())
-        }
-    }
+//    suspend fun insertWp() {
+//        withContext(Dispatchers.IO) {
+//            database.imageDao.insertAll(downloadedImages.value!!.asEntityWps())
+//        }
+//    }
 
     suspend fun NetworkWallpaper._validate(context: Context) {
         withContext(Dispatchers.IO) {
@@ -70,44 +81,72 @@ class Repository(private val database: ImageDatabase, private val context: Conte
         }
     }
 
-    fun List<NetworkWallpaper>.validate(context: Context): List<EntityWallpaper> {
+    private fun List<NetworkWallpaper>.validate(context: Context): List<EntityWallpaper> {
 
         return map {
+            val fileName = it.imageId
             val imgUri = it.contentUrl.toUri().buildUpon().scheme("https").build()
-            val img = Glide.with(context).load(imgUri).into(object: CustomTarget<Drawable>() {
-
-                override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
-                    val bitmap = resource.toBitmap()
-
-                }
-
-                override fun onLoadCleared(placeholder: Drawable?) {
-
-                }
-
-                override fun onLoadFailed(errorDrawable: Drawable?) {
-
-                }
-            })
-
+            val imageFile = File(dir, fileName)
+            val path = imageFile.absolutePath
+            downloadImage(imgUri, imageFile, fileName)
             EntityWallpaper(
                 imageId = it.imageId,
-
+                path = path
             )
         }
     }
 
     suspend fun downloadWallpapers(query: String) {
-        downloadedImages.value = mutableListOf()
-        val wallpapers = Api.retrofitService.getImages(query, "Wallpaper", "Tall", 100)
-        if (databaseSource) {
-            images.removeSource(databaseImages)
-            images.addSource(downloadedImages) {images.value = it}
-            databaseSource = false
+            val wallpapers = Api.retrofitService.getImages(query, "Wallpaper", "Tall", 35)
+            listSize.value = wallpapers.size
+            withContext(Dispatchers.IO) {
+                database.imageDao.insertAll(wallpapers.validate(context))
+            }
+    }
+
+    private fun downloadImage(uri: Uri, file: File, id: String) {
+        Glide.with(context).load(uri).into(object: CustomTarget<Drawable>() {
+            override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                val bitmap = resource.toBitmap()
+                saveImage(bitmap, file)
+            }
+
+            override fun onLoadCleared(placeholder: Drawable?) {
+
+            }
+
+            override fun onLoadFailed(errorDrawable: Drawable?) {
+                increment(id)
+            }
+        })
+    }
+
+    private fun saveImage(bitmap: Bitmap, imageFile: File) {
+        dirCreated = if (!dir.exists()) {
+            dir.mkdir()
+        } else {
+            true
         }
-        listSize.value = wallpapers.size
-        for (wp in wallpapers) {
-            wp._validate(context)
+        if (dirCreated) {
+            try {
+                val fOut = FileOutputStream(imageFile)
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fOut)
+                Log.i("loading", "image saved")
+                fOut.close()
+                increment()
+            } catch (e: Exception) {
+                Log.e("loading", "Failed to save image", e)
+            }
+        } else {
+            Log.e("loading", "Failed to create dir")
+        }
+    }
+
+    fun delete(wps: List<EntityWallpaper>?) {
+        if (wps != null) {
+            for (wp in wps) {
+                context.deleteFile(wp.path)
+            }
         }
     }
 }
