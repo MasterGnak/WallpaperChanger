@@ -4,7 +4,6 @@ package com.example.wallpaperchanger
 import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.core.net.toUri
@@ -16,10 +15,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
-import com.example.wallpaperchanger.network.NetworkWallpaper
 import com.example.wallpaperchanger.network.Wallpaper
-import com.example.wallpaperchanger.selector.Adapter
-import com.example.wallpaperchanger.selector.SelectionViewModel
 
 
 @BindingAdapter("image")
