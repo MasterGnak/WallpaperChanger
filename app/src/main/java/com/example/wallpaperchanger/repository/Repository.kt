@@ -32,16 +32,9 @@ import java.lang.Exception
 
 class Repository(private val database: ImageDatabase, private val context: Context) {
 
-
-    private var databaseSource = true
-
-    //val images = MediatorLiveData<List<Wallpaper>>()
-
     val images = Transformations.map(database.imageDao.getAll()) {
         it.asWallpapers()
     }
-
-    private val downloadedImages = MutableLiveData<MutableList<Wallpaper>>(mutableListOf())
 
     var listSize = MutableLiveData(-1)
 
@@ -53,7 +46,6 @@ class Repository(private val database: ImageDatabase, private val context: Conte
 
     init {
         Log.i("loading", "path is $dirPath, dir exists: ${dir.exists()}")
-        //images.addSource(databaseImages) { images.value = it }
     }
 
 
@@ -61,23 +53,14 @@ class Repository(private val database: ImageDatabase, private val context: Conte
         MainScope().launch {
             count.value = count.value?.plus(1)
             if (id.isNotEmpty()) {
-                withContext(Dispatchers.IO) {
-                    database.imageDao.remove(id[0])
-                }
+                remove(id[0])
             }
         }
     }
 
-//    suspend fun insertWp() {
-//        withContext(Dispatchers.IO) {
-//            database.imageDao.insertAll(downloadedImages.value!!.asEntityWps())
-//        }
-//    }
-
-    suspend fun NetworkWallpaper._validate(context: Context) {
+    private suspend fun remove(id: String) {
         withContext(Dispatchers.IO) {
-            val imgUri = this@_validate.contentUrl.toUri().buildUpon().scheme("https").build()
-
+            database.imageDao.remove(id)
         }
     }
 
@@ -107,8 +90,7 @@ class Repository(private val database: ImageDatabase, private val context: Conte
     private fun downloadImage(uri: Uri, file: File, id: String) {
         Glide.with(context).load(uri).into(object: CustomTarget<Drawable>() {
             override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
-                val bitmap = resource.toBitmap()
-                saveImage(bitmap, file)
+                saveImage(resource.toBitmap(), file)
             }
 
             override fun onLoadCleared(placeholder: Drawable?) {
@@ -139,14 +121,6 @@ class Repository(private val database: ImageDatabase, private val context: Conte
             }
         } else {
             Log.e("loading", "Failed to create dir")
-        }
-    }
-
-    fun delete(wps: List<EntityWallpaper>?) {
-        if (wps != null) {
-            for (wp in wps) {
-                context.deleteFile(wp.path)
-            }
         }
     }
 }

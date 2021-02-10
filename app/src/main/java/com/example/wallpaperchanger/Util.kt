@@ -23,6 +23,8 @@ fun bindImage(imgView: ImageView, image: Wallpaper?) {
     image?.let {
         if (it.bitmap != null) {
             imgView.setImageBitmap(it.bitmap)
+        } else {
+            Log.i("binding", "bitmap is null")
         }
     }
 }
@@ -31,6 +33,7 @@ fun bindImage(imgView: ImageView, image: Wallpaper?) {
 fun listImages(recyclerView: RecyclerView, list: List<Wallpaper>?) {
     val adapter = recyclerView.adapter as Adapter
     adapter.submitList(list)
+    adapter.updateMap()
     Log.i("loading", "list is empty or null: ${list.isNullOrEmpty()} ${list?.size}")
 }
 

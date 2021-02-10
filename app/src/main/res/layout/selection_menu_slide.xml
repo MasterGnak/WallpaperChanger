@@ -2,8 +2,7 @@
 <layout xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
         xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
-        <variable name="wallpaper" type="com.example.wallpaperchanger.network.Wallpaper"/>
-        <variable name="bitmap" type="android.graphics.Bitmap"/>
+
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -15,15 +14,25 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:text="@string/set_as_wp"
+                android:text="@string/add_to_collection"
                 android:gravity="center"
                 android:textSize="@dimen/text_size"
                 android:layout_marginTop="8dp"
-                android:id="@+id/setAsWp"/>
+                android:id="@+id/add_to_collection"/>
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/add_to_collection"
+                android:text="@string/set_as_wp"
+                android:gravity="center"
+                android:textSize="@dimen/text_size"
+                android:id="@+id/set_as_wp" android:layout_marginTop="8dp"/>
         <Space
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/menu_height"
-                app:layout_constraintTop_toBottomOf="@+id/setAsWp"
+                app:layout_constraintTop_toBottomOf="@+id/set_as_wp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>

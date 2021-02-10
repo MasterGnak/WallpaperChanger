@@ -3,6 +3,6 @@
     <dimen name="stroke">2dp</dimen>
     <dimen name="tiny">4dp</dimen>
     <dimen name="menu_height">100dp</dimen>
-    <dimen name="menu_margin">-140dp</dimen>
+    <dimen name="menu_margin">-160dp</dimen>
     <dimen name="text_size">16sp</dimen>
 </resources>

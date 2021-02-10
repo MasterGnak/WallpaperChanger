@@ -23,7 +23,10 @@ class SelectionViewModel(application: Application) : AndroidViewModel(applicatio
     val images = repository.images
     val listSize = repository.listSize
     val count = repository.count
-    val dirPath = repository.dirPath
+    private val dirPath = repository.dirPath
+
+    var menuOpened = false
+    var severalSelected = false
 
     fun toggleVisibility() {
         _hidden.value = !_hidden.value!!
@@ -31,18 +34,6 @@ class SelectionViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun resetCount() {
         count.value = 0
-    }
-
-    private val _menuOpened = MutableLiveData(false)
-    val menuOpened: LiveData<Boolean>
-        get() = _menuOpened
-
-    fun showMenu() {
-        _menuOpened.value = true
-    }
-
-    fun hideMenu() {
-        _menuOpened.value = false
     }
 
     fun downloadWp(query: String) {

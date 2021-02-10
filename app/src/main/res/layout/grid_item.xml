@@ -5,15 +5,22 @@
     <data>
         <variable name="image" type="com.example.wallpaperchanger.network.Wallpaper"/>
     </data>
-
+    <FrameLayout
+            android:id="@+id/item_frame"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="@dimen/tiny"
+            android:paddingBottom="@dimen/tiny"
+            android:paddingStart="@dimen/tiny"
+            android:paddingEnd="@dimen/tiny"
+            android:background="@drawable/image_background">
         <ImageView
                 android:id="@+id/item_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                app:image="@{image}"
-                android:background="@color/primaryColor"
-                android:paddingTop="@dimen/tiny"
-                android:paddingBottom="@dimen/tiny"/>
+                app:image="@{image}"/>
+    </FrameLayout>
+
 
 </layout>
