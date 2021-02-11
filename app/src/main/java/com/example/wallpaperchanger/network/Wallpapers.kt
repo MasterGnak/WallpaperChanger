@@ -17,6 +17,7 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
+import com.example.wallpaperchanger.dirPath
 import com.squareup.moshi.*
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -39,16 +40,18 @@ data class Wallpaper (
 @Entity(tableName = "wallpaper_table")
 data class EntityWallpaper(
     @PrimaryKey
-    val imageId: String,
+    val imageId: String
+)
 
-    @ColumnInfo
-    val path: String,
-
+@Entity(tableName = "collection_table")
+data class CollectionWallpaper(
+    @PrimaryKey
+    val imageId: String
 )
 
 fun List<EntityWallpaper>.asWallpapers(): List<Wallpaper> {
     return map {
-        val bitmap = BitmapFactory.decodeFile(it.path)
+        val bitmap = BitmapFactory.decodeFile(dirPath + it.imageId)
         if (bitmap != null) {
             Wallpaper(
                 imageId = it.imageId,

@@ -55,3 +55,6 @@ fun visibleAnim(progressBar: ProgressBar, hidden: Boolean) {
     }
 }
 
+lateinit var dirPath: String
+lateinit var dirPathC: String
+

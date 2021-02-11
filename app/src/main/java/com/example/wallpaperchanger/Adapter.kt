@@ -142,4 +142,12 @@ class Adapter(): ListAdapter<Wallpaper, Adapter.ViewHolder>(DiffCallback) {
         return selectedWp
     }
 
+    fun getMultipleSelection(): List<Wallpaper> {
+        val list = mutableListOf<Wallpaper>()
+        tracker.selection.forEach {
+            list.add(getItem(keyMap[it]!!))
+        }
+        return list
+    }
+
 }

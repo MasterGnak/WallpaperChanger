@@ -119,6 +119,11 @@ class SelectionFragment : Fragment() {
             tracker.clearSelection()
         }
 
+        binding.bottomMenu.addToCollection.setOnClickListener {
+            viewModel.addToCollection(adapter.getMultipleSelection())
+            tracker.clearSelection()
+        }
+
         viewModel.count.observe(viewLifecycleOwner) {
             binding.progressHorizontal.progress = it
             if (it == viewModel.listSize.value) {

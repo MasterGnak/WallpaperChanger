@@ -3,6 +3,9 @@ package com.example.wallpaperchanger.selector
 import android.app.Application
 
 import androidx.lifecycle.*
+import androidx.recyclerview.selection.Selection
+import com.example.wallpaperchanger.dirPath
+import com.example.wallpaperchanger.network.Wallpaper
 import com.example.wallpaperchanger.repository.Repository
 import com.example.wallpaperchanger.room.getDatabase
 import kotlinx.coroutines.Dispatchers
@@ -23,7 +26,6 @@ class SelectionViewModel(application: Application) : AndroidViewModel(applicatio
     val images = repository.images
     val listSize = repository.listSize
     val count = repository.count
-    private val dirPath = repository.dirPath
 
     var menuOpened = false
     var severalSelected = false
@@ -44,21 +46,17 @@ class SelectionViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
-    init {
-//        if (images.value.isNullOrEmpty()) {
-//            viewModelScope.launch {
-//                clear()
-//                repository.downloadWallpapers()
-//            }
-//        } else {
-//            toggleVisibility()
-//        }
-    }
-
     private suspend fun clear() {
         withContext(Dispatchers.IO) {
             FileUtils.deleteDirectory(File(dirPath))
             database.imageDao.clear()
         }
     }
+
+    fun addToCollection(selection: List<Wallpaper>) {
+        viewModelScope.launch {
+            repository.addToCollection(selection)
+        }
+    }
+
 }

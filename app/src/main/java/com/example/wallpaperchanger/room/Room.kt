@@ -3,6 +3,7 @@ package com.example.wallpaperchanger.room
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.example.wallpaperchanger.network.CollectionWallpaper
 import com.example.wallpaperchanger.network.EntityWallpaper
 
 @Dao
@@ -10,11 +11,14 @@ interface ImageDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(images: List<EntityWallpaper>)
 
-    @Insert
-    fun insertOne(image: EntityWallpaper)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAllC(images: List<CollectionWallpaper>)
 
     @Query("DELETE FROM wallpaper_table WHERE imageId = :imageId")
-    fun remove(imageId: String)
+    suspend fun remove(imageId: String)
+
+    @Query("DELETE FROM collection_table WHERE imageId = :imageId")
+    suspend fun removeC(imageId: String)
 
     @Query("DELETE FROM wallpaper_table")
     fun clear()
@@ -24,9 +28,11 @@ interface ImageDao {
 
     @Query("SELECT count(*) FROM wallpaper_table")
     fun getCount(): Int
+
+
 }
 
-@Database(entities = [EntityWallpaper::class], version = 1)
+@Database(entities = [EntityWallpaper::class, CollectionWallpaper::class], version = 11)
 abstract class ImageDatabase: RoomDatabase() {
     abstract val imageDao: ImageDao
 }
