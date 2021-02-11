@@ -37,10 +37,11 @@ class SelectionFragment : Fragment() {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
         val wpManager = WallpaperManager.getInstance(context)
-        val showM = ObjectAnimator.ofFloat(binding.bottomMenu.root, "translationY", -140f).apply { duration = 500 }
-        val hideM = ObjectAnimator.ofFloat(binding.bottomMenu.root, "translationY", -140f, 0f).apply { duration = 500 }
-        val showOneM = ObjectAnimator.ofFloat(binding.bottomMenu.root, "translationY", -80f, -140f).apply { duration = 400 }
-        val hideOneM = ObjectAnimator.ofFloat(binding.bottomMenu.root, "translationY", -140f, -80f).apply { duration = 400 }
+        val showM = ObjectAnimator.ofFloat(binding.bottomMenu.root, "translationY", -200f).apply { duration = 500 }
+        val hideM = ObjectAnimator.ofFloat(binding.bottomMenu.root, "translationY", -200f, 0f).apply { duration = 500 }
+        val showOneM = ObjectAnimator.ofFloat(binding.bottomMenu.root, "translationY", -140f, -200f).apply { duration = 400 }
+        val hideOneM = ObjectAnimator.ofFloat(binding.bottomMenu.root, "translationY", -200f, -140f).apply { duration = 400 }
+        val hidePartM = ObjectAnimator.ofFloat(binding.bottomMenu.root, "translationY", -140f, 0f).apply { duration = 500 }
         val imm = requireNotNull(activity).getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         val sharedPrefs = requireContext().getSharedPreferences("queryPrefs", MODE_PRIVATE)
         binding.editQuery.setText(sharedPrefs.getString("queryText", null))
@@ -64,9 +65,13 @@ class SelectionFragment : Fragment() {
                 if (!viewModel.menuOpened) {
                     showM.start()
                     viewModel.menuOpened = true
-                    Log.i("tracker", tracker.selection.toString())
                 } else if (!tracker.hasSelection()) {
-                    hideM.start()
+                    if (viewModel.severalSelected) {
+                        hidePartM.start()
+                    } else {
+                        hideM.start()
+                    }
+                    viewModel.severalSelected = false
                     viewModel.menuOpened = false
                 } else if (tracker.selection.size() == 1) {
                     showOneM.start()
@@ -99,7 +104,7 @@ class SelectionFragment : Fragment() {
 //        })
 
 
-        binding.bottomMenu.root.setOnClickListener {
+        binding.bottomMenu.setAsWp.setOnClickListener {
             MainScope().launch {
                 hideM.start()
                 viewModel.menuOpened = false
@@ -108,6 +113,10 @@ class SelectionFragment : Fragment() {
                     wpManager.setBitmap(adapter.getSingleSelection().bitmap)
                 }
             }
+        }
+
+        binding.bottomMenu.clearSelection.setOnClickListener {
+            tracker.clearSelection()
         }
 
         viewModel.count.observe(viewLifecycleOwner) {
@@ -121,10 +130,7 @@ class SelectionFragment : Fragment() {
 
         binding.editQuery.setOnFocusChangeListener { editText: View, focused: Boolean ->
             if (focused) {
-                if (viewModel.menuOpened) {
-                    hideM.start()
-                    viewModel.menuOpened = false
-                }
+                tracker.clearSelection()
                 binding.confirmQuery.visibility = View.VISIBLE
             } else {
                 binding.confirmQuery.visibility = View.GONE

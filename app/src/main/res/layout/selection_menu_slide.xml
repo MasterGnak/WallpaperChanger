@@ -13,7 +13,7 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/clear_selection"
                 android:text="@string/add_to_collection"
                 android:gravity="center"
                 android:textSize="@dimen/text_size"
@@ -24,11 +24,23 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:text="@string/clear_selection"
+                android:gravity="center"
+                android:textSize="@dimen/text_size"
+                android:layout_marginTop="8dp"
+                android:id="@+id/clear_selection"/>
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/add_to_collection"
                 android:text="@string/set_as_wp"
                 android:gravity="center"
                 android:textSize="@dimen/text_size"
-                android:id="@+id/set_as_wp" android:layout_marginTop="8dp"/>
+                android:id="@+id/set_as_wp"
+                android:layout_marginTop="8dp"/>
         <Space
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/menu_height"
