@@ -2,7 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
-<variable name="viewModel" type="com.example.wallpaperchanger.saved.CollectionViewModel"/>
+        <variable name="viewModel" type="com.example.wallpaperchanger.collection.CollectionViewModel"/>
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -14,11 +14,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-
-                app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+                app:imageList="@{viewModel.images}"
         />
-<!--        app:imageList="@{viewModel.images}"-->
-<!--        app:visible="@{viewModel.hidden}"-->
+        <!--        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"-->
+        <!--        app:visible="@{viewModel.hidden}"-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator
 import android.app.Activity
 import android.app.WallpaperManager
 import android.content.Context.MODE_PRIVATE
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -16,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.selection.SelectionPredicates
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.selection.StorageStrategy
+import com.bumptech.glide.Glide
 import com.example.wallpaperchanger.Adapter
 import com.example.wallpaperchanger.databinding.SelectionFragmentBinding
 import kotlinx.coroutines.Dispatchers
@@ -89,28 +91,14 @@ class SelectionFragment : Fragment() {
 
         adapter.setTracker(tracker)
 
-//        adapter.setClickListener(Adapter.ClickListener {
-//            binding.editQuery.clearFocus()
-//            imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
-//            if (viewModel.menuOpened.value == false) {
-//                binding.bottomMenu.bitmap = it.bitmap
-//                showM.start()
-//                viewModel.showMenu()
-//            } else if (viewModel.menuOpened.value == true) {
-//                hideM.start()
-//                viewModel.hideMenu()
-//                binding.bottomMenu.bitmap = null
-//            }
-//        })
-
-
         binding.bottomMenu.setAsWp.setOnClickListener {
             MainScope().launch {
                 hideM.start()
                 viewModel.menuOpened = false
                 Toast.makeText(context, "Обои обновлены", Toast.LENGTH_SHORT).show()
                 withContext(Dispatchers.IO) {
-                    wpManager.setBitmap(adapter.getSingleSelection().bitmap)
+                    val bitmap = Glide.with(requireContext()).asBitmap().load(adapter.getSingleSelection().uri).submit()
+                    wpManager.setBitmap(bitmap.get())
                 }
             }
         }

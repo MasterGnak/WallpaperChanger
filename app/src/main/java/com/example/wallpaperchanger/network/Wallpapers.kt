@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.util.Log
 import androidx.core.net.toUri
 import androidx.room.ColumnInfo
@@ -23,45 +24,65 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
+import java.io.File
 import java.lang.UnsupportedOperationException
 
-data class NetworkWallpaper (
+data class NetworkWallpaper(
     val imageId: String,
     val contentUrl: String
-    ) {
+) {
 
 }
 
-data class Wallpaper (
+data class Wallpaper(
     val imageId: String,
-    val bitmap: Bitmap? = null
-    )
+    val uri: Uri
+)
 
 @Entity(tableName = "wallpaper_table")
 data class EntityWallpaper(
     @PrimaryKey
     val imageId: String
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        return if (other is CollectionWallpaper) {
+            imageId == other.imageId
+        } else {
+            super.equals(other)
+        }
+    }
+}
 
 @Entity(tableName = "collection_table")
 data class CollectionWallpaper(
     @PrimaryKey
     val imageId: String
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        return if (other is EntityWallpaper) {
+            imageId == other.imageId
+        } else {
+            super.equals(other)
+        }
+    }
+}
 
 fun List<EntityWallpaper>.asWallpapers(): List<Wallpaper> {
     return map {
-        val bitmap = BitmapFactory.decodeFile(dirPath + it.imageId)
-        if (bitmap != null) {
-            Wallpaper(
-                imageId = it.imageId,
-                bitmap = bitmap
-            )
-        } else {
-            Wallpaper(
-                imageId = it.imageId,
-            )
-        }
+        Wallpaper(
+            imageId = it.imageId,
+            uri = Uri.fromFile(File(dirPath + it.imageId))
+        )
+    }
+}
+
+fun List<CollectionWallpaper>.asWallpapersC(): List<Wallpaper> {
+    return map {
+        Wallpaper(
+            imageId = it.imageId,
+            uri = Uri.fromFile(File(dirPath + it.imageId))
+        )
+
     }
 }
 

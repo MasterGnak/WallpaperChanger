@@ -5,11 +5,15 @@ import android.app.Application
 import androidx.lifecycle.*
 import androidx.recyclerview.selection.Selection
 import com.example.wallpaperchanger.dirPath
+import com.example.wallpaperchanger.network.EntityWallpaper
 import com.example.wallpaperchanger.network.Wallpaper
+import com.example.wallpaperchanger.network.asWallpapers
+import com.example.wallpaperchanger.network.asWallpapersC
 import com.example.wallpaperchanger.repository.Repository
 import com.example.wallpaperchanger.room.getDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.apache.commons.io.FileUtils
 import java.io.File
@@ -48,7 +52,11 @@ class SelectionViewModel(application: Application) : AndroidViewModel(applicatio
 
     private suspend fun clear() {
         withContext(Dispatchers.IO) {
-            FileUtils.deleteDirectory(File(dirPath))
+            val list = database.imageDao.getAll().value
+            val collection = database.imageDao.getAllC().value
+            list?.minus(collection)?.forEach {
+                File(dirPath, (it as EntityWallpaper).imageId).delete()
+            }
             database.imageDao.clear()
         }
     }

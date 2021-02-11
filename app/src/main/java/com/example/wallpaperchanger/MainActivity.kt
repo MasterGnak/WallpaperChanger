@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
         //appBarConfiguration = AppBarConfiguration(navController.graph, drawerLayout)
         NavigationUI.setupWithNavController(binding.navView, navController)
         val imm = requireNotNull(this).getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+
         binding.drawerLayout.addDrawerListener(object: DrawerLayout.DrawerListener {
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
                 binding.drawerLayout.requestFocus()

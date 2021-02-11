@@ -5,4 +5,7 @@
 
     <fragment android:id="@+id/selectionFragment" android:name="com.example.wallpaperchanger.selector.SelectionFragment"
               android:label="SelectionFragment"/>
+    <fragment android:id="@+id/collectionFragment"
+              android:name="com.example.wallpaperchanger.collection.CollectionFragment"
+              android:label="CollectionFragment"/>
 </navigation>

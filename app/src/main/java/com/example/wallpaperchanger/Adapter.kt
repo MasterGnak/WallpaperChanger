@@ -17,12 +17,7 @@ class Adapter(): ListAdapter<Wallpaper, Adapter.ViewHolder>(DiffCallback) {
 
     val keyMap = HashMap<String, Int>()
 
-    private lateinit var clickListener: ClickListener
     private lateinit var tracker: SelectionTracker<String>
-
-    fun setClickListener(listener: ClickListener) {
-        clickListener = listener
-    }
 
     fun setTracker(selector: SelectionTracker<String>) {
         tracker = selector
@@ -49,9 +44,6 @@ class Adapter(): ListAdapter<Wallpaper, Adapter.ViewHolder>(DiffCallback) {
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val image = getItem(position)
         holder.bind(image, tracker.isSelected(getItemKey(position)))
-//        holder.itemView.setOnClickListener{
-//            clickListener.onClick(image)
-//        }
     }
 
     class ViewHolder private constructor(private val binding: GridItemBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -76,10 +68,6 @@ class Adapter(): ListAdapter<Wallpaper, Adapter.ViewHolder>(DiffCallback) {
             return details
         }
 
-    }
-
-    class ClickListener(val onClickListener: (wallpaper: Wallpaper) -> Unit) {
-        fun onClick(wp: Wallpaper) = onClickListener(wp)
     }
 
     companion object DiffCallback: DiffUtil.ItemCallback<Wallpaper>() {

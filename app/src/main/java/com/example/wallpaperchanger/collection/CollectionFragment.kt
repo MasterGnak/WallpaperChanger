@@ -1,22 +1,18 @@
-package com.example.wallpaperchanger.saved
+package com.example.wallpaperchanger.collection
 
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.selection.SelectionPredicates
+import androidx.recyclerview.selection.SelectionTracker
+import androidx.recyclerview.selection.StorageStrategy
 import com.example.wallpaperchanger.Adapter
-import com.example.wallpaperchanger.R
 import com.example.wallpaperchanger.databinding.CollectionFragmentBinding
 
 class CollectionFragment : Fragment() {
-
-    companion object {
-        fun newInstance() = CollectionFragment()
-    }
 
     private lateinit var viewModel: CollectionViewModel
     private lateinit var binding: CollectionFragmentBinding
@@ -26,19 +22,24 @@ class CollectionFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = CollectionFragmentBinding.inflate(inflater)
+        binding.lifecycleOwner = this
         viewModel = ViewModelProvider(this).get(CollectionViewModel::class.java)
         binding.viewModel = viewModel
+        val adapter = Adapter()
+        binding.collectionList.adapter = adapter
 
-        binding.collectionList.adapter = Adapter()
+        val tracker = SelectionTracker.Builder(
+            "tracker",
+            binding.collectionList,
+            Adapter.KeyProvider(adapter),
+            Adapter.DetailsLookup(binding.collectionList),
+            StorageStrategy.createStringStorage()
+        ).withSelectionPredicate(SelectionPredicates.createSelectAnything()).build()
+
+        adapter.setTracker(tracker)
 
 
         return binding.root
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
-
     }
 
 }

@@ -8,21 +8,13 @@ import android.os.Environment
 import android.util.Log
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import androidx.recyclerview.selection.Selection
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import com.example.wallpaperchanger.R
 import com.example.wallpaperchanger.dirPath
-import com.example.wallpaperchanger.dirPathC
 import com.example.wallpaperchanger.network.*
 import com.example.wallpaperchanger.room.ImageDatabase
 import kotlinx.coroutines.Dispatchers
@@ -36,8 +28,9 @@ import java.lang.Exception
 class Repository(private val database: ImageDatabase, private val context: Context) {
 
     init {
-        dirPath = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)?.absolutePath + "/" + context.getString(R.string.app_name) + "/temp/"
-        dirPathC = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)?.absolutePath + "/" + context.getString(R.string.app_name) + "/collection/"
+        dirPath =
+            context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)?.absolutePath + "/" + context.getString(R.string.app_name) + "/"
+
     }
 
 
@@ -45,11 +38,14 @@ class Repository(private val database: ImageDatabase, private val context: Conte
         it.asWallpapers()
     }
 
+    val imagesC = Transformations.map(database.imageDao.getAllC()) {
+        it.asWallpapersC()
+    }
+
     var listSize = MutableLiveData(-1)
     var count = MutableLiveData(0)
 
     private val dir = File(dirPath)
-    private val dirC = File(dirPathC)
 
     init {
         Log.i("loading", "path is $dirPath, dir exists: ${dir.exists()}")
@@ -91,7 +87,7 @@ class Repository(private val database: ImageDatabase, private val context: Conte
     }
 
     private fun downloadImage(uri: Uri, id: String) {
-        Glide.with(context).load(uri).into(object: CustomTarget<Drawable>() {
+        Glide.with(context).load(uri).into(object : CustomTarget<Drawable>() {
             override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
                 saveImage(resource.toBitmap(), dir, id)
             }
@@ -128,15 +124,12 @@ class Repository(private val database: ImageDatabase, private val context: Conte
     }
 
     suspend fun addToCollection(selection: List<Wallpaper>) {
-        for (wp in selection) {
-            saveImage(wp.bitmap!!, dirC, wp.imageId)
-            withContext(Dispatchers.IO) {
-                database.imageDao.insertAllC(
-                    selection.map {
-                        CollectionWallpaper(it.imageId)
-                    }
-                )
-            }
+        withContext(Dispatchers.IO) {
+            database.imageDao.insertAllC(
+                selection.map {
+                    CollectionWallpaper(it.imageId)
+                }
+            )
         }
     }
 

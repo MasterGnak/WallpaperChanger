@@ -2,6 +2,7 @@ package com.example.wallpaperchanger
 
 
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
@@ -19,14 +20,8 @@ import com.example.wallpaperchanger.network.Wallpaper
 
 
 @BindingAdapter("image")
-fun bindImage(imgView: ImageView, image: Wallpaper?) {
-    image?.let {
-        if (it.bitmap != null) {
-            imgView.setImageBitmap(it.bitmap)
-        } else {
-            Log.i("binding", "bitmap is null")
-        }
-    }
+fun bindImage(imgView: ImageView, image: Wallpaper) {
+        Glide.with(imgView.context).load(image.uri).into(imgView)
 }
 
 @BindingAdapter("imageList")
@@ -56,5 +51,4 @@ fun visibleAnim(progressBar: ProgressBar, hidden: Boolean) {
 }
 
 lateinit var dirPath: String
-lateinit var dirPathC: String
 

@@ -26,13 +26,16 @@ interface ImageDao {
     @Query("SELECT * FROM wallpaper_table")
     fun getAll(): LiveData<List<EntityWallpaper>>
 
+    @Query("SELECT * FROM collection_table")
+    fun getAllC(): LiveData<List<CollectionWallpaper>>
+
     @Query("SELECT count(*) FROM wallpaper_table")
     fun getCount(): Int
 
 
 }
 
-@Database(entities = [EntityWallpaper::class, CollectionWallpaper::class], version = 11)
+@Database(entities = [EntityWallpaper::class, CollectionWallpaper::class], version = 101)
 abstract class ImageDatabase: RoomDatabase() {
     abstract val imageDao: ImageDao
 }
