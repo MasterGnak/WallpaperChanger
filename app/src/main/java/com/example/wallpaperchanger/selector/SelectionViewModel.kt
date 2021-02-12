@@ -45,26 +45,28 @@ class SelectionViewModel(application: Application) : AndroidViewModel(applicatio
     fun downloadWp(query: String) {
         viewModelScope.launch {
             toggleVisibility()
-            clear()
+            repository.clear()
             repository.downloadWallpapers(query)
         }
     }
 
-    private suspend fun clear() {
-        withContext(Dispatchers.IO) {
-            val list = database.imageDao.getAll().value
-            val collection = database.imageDao.getAllC().value
-            list?.minus(collection)?.forEach {
-                File(dirPath, (it as EntityWallpaper).imageId).delete()
-            }
-            database.imageDao.clear()
-        }
-    }
+//    private suspend fun clear() {
+//        withContext(Dispatchers.IO) {
+//            val list = database.imageDao.getAll().value
+//            val collection = database.imageDao.getAllC().value
+//            list?.minus(collection)?.forEach {
+//                File(dirPath, (it as EntityWallpaper).imageId).delete()
+//            }
+//            database.imageDao.clear()
+//        }
+//    }
 
     fun addToCollection(selection: List<Wallpaper>) {
         viewModelScope.launch {
             repository.addToCollection(selection)
         }
     }
+
+
 
 }

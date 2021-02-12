@@ -133,4 +133,25 @@ class Repository(private val database: ImageDatabase, private val context: Conte
         }
     }
 
+    suspend fun clear() {
+        withContext(Dispatchers.IO) {
+            val list = database.imageDao.getAll().value
+            val collection = database.imageDao.getAllC().value
+            list?.minus(collection)?.forEach {
+                File(dirPath, (it as EntityWallpaper).imageId).delete()
+            }
+            database.imageDao.clear()
+        }
+    }
+
+    suspend fun clearC(collection: List<Wallpaper>) {
+        withContext(Dispatchers.IO) {
+            val list = database.imageDao.getAll().value
+            collection.minus(list).forEach {
+                File(dirPath, (it as Wallpaper).imageId).delete()
+            }
+            database.imageDao.clearC()
+        }
+    }
+
 }

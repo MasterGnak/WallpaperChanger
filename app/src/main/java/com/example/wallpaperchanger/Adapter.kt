@@ -21,16 +21,13 @@ class Adapter(): ListAdapter<Wallpaper, Adapter.ViewHolder>(DiffCallback) {
 
     fun setTracker(selector: SelectionTracker<String>) {
         tracker = selector
-        Log.i("tracker", "tracker set")
     }
 
     fun updateMap() {
         keyMap.clear()
         for (i in currentList.indices) {
-            Log.i("map", "$i")
             keyMap[currentList[i].imageId] = i
         }
-        Log.i("map", "updated")
     }
 
     fun getItemKey(position: Int): String {

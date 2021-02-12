@@ -7,4 +7,5 @@
     <string name="clear_selection">Очистить выделение</string>
     <string name="search">Поиск</string>
     <string name="Collection">Коллекция</string>
+    <string name="remove_from_collection">Убрать из коллекции</string>
 </resources>

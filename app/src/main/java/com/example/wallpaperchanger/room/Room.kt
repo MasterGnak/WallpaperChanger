@@ -23,6 +23,9 @@ interface ImageDao {
     @Query("DELETE FROM wallpaper_table")
     fun clear()
 
+    @Query("DELETE FROM collection_table")
+    fun clearC()
+
     @Query("SELECT * FROM wallpaper_table")
     fun getAll(): LiveData<List<EntityWallpaper>>
 

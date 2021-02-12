@@ -61,7 +61,6 @@ class SelectionFragment : Fragment() {
 
         tracker.addObserver(object : SelectionTracker.SelectionObserver<String>() {
 
-
             override fun onSelectionChanged() {
                 super.onSelectionChanged()
                 if (!viewModel.menuOpened) {
@@ -84,9 +83,7 @@ class SelectionFragment : Fragment() {
                 }
             }
 
-            override fun onSelectionCleared() {
-
-            }
+            override fun onSelectionCleared() {}
         })
 
         adapter.setTracker(tracker)

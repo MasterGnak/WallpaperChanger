@@ -37,7 +37,15 @@ data class NetworkWallpaper(
 data class Wallpaper(
     val imageId: String,
     val uri: Uri
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        return when (other) {
+            is EntityWallpaper -> imageId == other.imageId
+            is CollectionWallpaper -> imageId == other.imageId
+            else -> super.equals(other)
+        }
+    }
+}
 
 @Entity(tableName = "wallpaper_table")
 data class EntityWallpaper(
@@ -45,10 +53,10 @@ data class EntityWallpaper(
     val imageId: String
 ) {
     override fun equals(other: Any?): Boolean {
-        return if (other is CollectionWallpaper) {
-            imageId == other.imageId
-        } else {
-            super.equals(other)
+        return when (other) {
+            is Wallpaper -> imageId == other.imageId
+            is CollectionWallpaper -> imageId == other.imageId
+            else -> super.equals(other)
         }
     }
 }
@@ -59,10 +67,10 @@ data class CollectionWallpaper(
     val imageId: String
 ) {
     override fun equals(other: Any?): Boolean {
-        return if (other is EntityWallpaper) {
-            imageId == other.imageId
-        } else {
-            super.equals(other)
+        return return when (other) {
+            is Wallpaper -> imageId == other.imageId
+            is EntityWallpaper -> imageId == other.imageId
+            else -> super.equals(other)
         }
     }
 }
