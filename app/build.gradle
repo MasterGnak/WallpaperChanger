@@ -35,6 +35,10 @@ android {
         }
     }
 
+    buildTypes.each {
+        it.buildConfigField 'String', 'API_KEY', apiKey
+    }
+
     buildFeatures {
         dataBinding true
     }
