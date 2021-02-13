@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <SwitchPreferenceCompat
+            android:key="switch"
+            android:title="@string/title_switch_preference"
+            app:iconSpaceReserved="false"/>
+
+    <ListPreference
+            android:key="list"
+            android:title="@string/title_list_preference"
+            android:entries="@array/lists"
+            android:entryValues="@array/lists"
+            android:defaultValue="@string/search"
+            android:summary="@string/summary_list_preference"
+            app:iconSpaceReserved="false"/>
+
+    <SeekBarPreference
+            android:key="frequency"
+            android:title="@string/title_frequency_list_preference"
+            android:max="24"
+            android:defaultValue="4"
+            app:iconSpaceReserved="false"/>
+
+
+</androidx.preference.PreferenceScreen>

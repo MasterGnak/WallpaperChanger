@@ -8,4 +8,6 @@
     <fragment android:id="@+id/collectionFragment"
               android:name="com.example.wallpaperchanger.collection.CollectionFragment"
               android:label="CollectionFragment"/>
+    <fragment android:id="@+id/settingsFragment" android:name="com.example.wallpaperchanger.SettingsFragment"
+              android:label="SettingsFragment"/>
 </navigation>
