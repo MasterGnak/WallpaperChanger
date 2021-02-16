@@ -90,6 +90,7 @@ class CollectionFragment : Fragment() {
                     val bitmap = Glide.with(requireContext()).asBitmap().load(adapter.getSingleSelection().uri).submit()
                     wpManager.setBitmap(bitmap.get())
                 }
+                tracker.clearSelection()
             }
         }
 

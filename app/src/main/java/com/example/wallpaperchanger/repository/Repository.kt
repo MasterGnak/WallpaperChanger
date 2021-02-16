@@ -30,9 +30,7 @@ class Repository(private val database: ImageDatabase, private val context: Conte
     init {
         dirPath =
             context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)?.absolutePath + "/" + context.getString(R.string.app_name) + "/"
-
     }
-
 
     val images = Transformations.map(database.imageDao.getAll()) {
         it.asWallpapers()

@@ -32,6 +32,12 @@ interface ImageDao {
     @Query("SELECT * FROM collection_table")
     fun getAllC(): LiveData<List<CollectionWallpaper>>
 
+    @Query("SELECT * FROM wallpaper_table")
+    fun getAllNotLive(): List<EntityWallpaper>
+
+    @Query("SELECT * FROM collection_table")
+    fun getAllCNotLive(): List<CollectionWallpaper>
+
     @Query("SELECT count(*) FROM wallpaper_table")
     fun getCount(): Int
 

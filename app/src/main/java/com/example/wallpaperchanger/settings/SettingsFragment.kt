@@ -1,23 +1,33 @@
-package com.example.wallpaperchanger
+package com.example.wallpaperchanger.settings
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.preference.*
+import com.example.wallpaperchanger.R
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
+    private lateinit var viewModel: SettingsViewModel
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        viewModel = ViewModelProvider(this).get(SettingsViewModel::class.java)
         val context = preferenceManager.context
         val screen = preferenceManager.createPreferenceScreen(context)
         val switch = SwitchPreferenceCompat(context).apply {
             key = "switch"
+            setDefaultValue(false)
             title = getString(R.string.title_switch_preference)
             isIconSpaceReserved = false
             isSingleLineTitle = false
+            setOnPreferenceChangeListener { preference, newValue ->
+                viewModel.switch = newValue as Boolean
+                viewModel.setupWork()
+                true
+            }
         }
         val list = ListPreference(context).apply {
             key = "list"
@@ -28,6 +38,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
             setDefaultValue(getString(R.string.search))
             isIconSpaceReserved = false
             isSingleLineTitle = false
+            setOnPreferenceChangeListener { preference, newValue ->
+                viewModel.list = newValue as String
+                viewModel.setupWork()
+                true
+            }
         }
         val seekBar = SeekBarPreference(context).apply {
             key = "frequency"
@@ -38,6 +53,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
             isIconSpaceReserved = false
             isSingleLineTitle = false
             showSeekBarValue = true
+            setOnPreferenceChangeListener { preference, newValue ->
+                viewModel.freq = (newValue as Int).toLong()
+                viewModel.setupWork()
+                true
+            }
         }
         screen.addPreference(switch)
         screen.addPreference(list)
@@ -50,4 +70,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         root?.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.primaryColor))
         return root
     }
+
+
 }
