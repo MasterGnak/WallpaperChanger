@@ -24,15 +24,15 @@ class CollectionViewModel(application: Application) : AndroidViewModel(applicati
     var menuOpened = false
     var severalSelected = false
 
-    suspend fun clear(collection: List<Wallpaper>) {
-        withContext(Dispatchers.IO) {
-            val list = database.imageDao.getAll().value
-            collection.minus(list).forEach {
-                File(dirPath, (it as Wallpaper).imageId).delete()
-            }
-            database.imageDao.clearC()
-        }
-    }
+//    suspend fun clear(collection: List<Wallpaper>) {
+//        withContext(Dispatchers.IO) {
+//            val list = database.imageDao.getAll().value
+//            collection.minus(list).forEach {
+//                File(dirPath, (it as Wallpaper).imageId).delete()
+//            }
+//            database.imageDao.clearC()
+//        }
+//    }
 
     fun clearC(collection: List<Wallpaper>) {
         viewModelScope.launch {

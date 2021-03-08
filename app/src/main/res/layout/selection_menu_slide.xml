@@ -8,6 +8,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/menu_background">
+
         <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -17,7 +18,7 @@
                 android:text="@string/add_to_collection"
                 android:gravity="center"
                 android:textSize="@dimen/text_size"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="@dimen/small"
                 android:id="@+id/addToCollection"/>
         <TextView
                 android:layout_width="match_parent"
@@ -28,7 +29,7 @@
                 android:text="@string/clear_selection"
                 android:gravity="center"
                 android:textSize="@dimen/text_size"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="@dimen/small"
                 android:id="@+id/clearSelection"/>
         <TextView
                 android:layout_width="match_parent"
@@ -40,10 +41,10 @@
                 android:gravity="center"
                 android:textSize="@dimen/text_size"
                 android:id="@+id/setAsWp"
-                android:layout_marginTop="8dp"/>
+                android:layout_marginTop="@dimen/small"/>
         <Space
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/menu_height"
+                android:layout_height="@dimen/small"
                 app:layout_constraintTop_toBottomOf="@+id/setAsWp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"/>

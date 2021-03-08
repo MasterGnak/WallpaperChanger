@@ -148,7 +148,9 @@ class Repository(private val database: ImageDatabase, private val context: Conte
             collection.minus(list).forEach {
                 File(dirPath, (it as Wallpaper).imageId).delete()
             }
-            database.imageDao.clearC()
+            database.imageDao.clearC(collection.map {
+                CollectionWallpaper(it.imageId)
+            })
         }
     }
 

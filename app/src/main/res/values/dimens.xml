@@ -2,7 +2,8 @@
 <resources>
     <dimen name="stroke">2dp</dimen>
     <dimen name="tiny">4dp</dimen>
+    <dimen name="small">8dp</dimen>
     <dimen name="menu_height">100dp</dimen>
-    <dimen name="menu_margin">-190dp</dimen>
+    <dimen name="menu_margin">-180dp</dimen>
     <dimen name="text_size">16sp</dimen>
 </resources>

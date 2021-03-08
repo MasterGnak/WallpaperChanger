@@ -14,6 +14,7 @@ import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.selection.StorageStrategy
 import com.bumptech.glide.Glide
 import com.example.wallpaperchanger.Adapter
+import com.example.wallpaperchanger.R
 import com.example.wallpaperchanger.databinding.CollectionFragmentBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -33,13 +34,19 @@ class CollectionFragment : Fragment() {
         binding.lifecycleOwner = this
         viewModel = ViewModelProvider(this).get(CollectionViewModel::class.java)
         binding.viewModel = viewModel
+        val menu = binding.bottomMenu.root
+
+        val fullPx = (3*resources.getDimensionPixelSize(R.dimen.text_size) + 6*resources.getDimensionPixelSize(R.dimen.small)).toFloat()
+        val partPx = (1*resources.getDimensionPixelSize(R.dimen.text_size) + 2*resources.getDimensionPixelSize(R.dimen.small)).toFloat()
+        val preHideM = ObjectAnimator.ofFloat(menu, "translationY", fullPx).apply { duration = 1 }
+        val showM = ObjectAnimator.ofFloat(menu, "translationY", fullPx, 0f).apply { duration = 500 }
+        val hideM = ObjectAnimator.ofFloat(menu, "translationY", fullPx).apply { duration = 500 }
+        val showOneM = ObjectAnimator.ofFloat(menu, "translationY", partPx, 0f).apply { duration = 400 }
+        val hideOneM = ObjectAnimator.ofFloat(menu, "translationY", partPx).apply { duration = 400 }
+        val hidePartM = ObjectAnimator.ofFloat(menu, "translationY", partPx, fullPx).apply { duration = 500 }
+        preHideM.start()
 
         val wpManager = WallpaperManager.getInstance(context)
-        val showM = ObjectAnimator.ofFloat(binding.bottomMenu.root, "translationY", -200f).apply { duration = 500 }
-        val hideM = ObjectAnimator.ofFloat(binding.bottomMenu.root, "translationY", -200f, 0f).apply { duration = 500 }
-        val showOneM = ObjectAnimator.ofFloat(binding.bottomMenu.root, "translationY", -140f, -200f).apply { duration = 400 }
-        val hideOneM = ObjectAnimator.ofFloat(binding.bottomMenu.root, "translationY", -200f, -140f).apply { duration = 400 }
-        val hidePartM = ObjectAnimator.ofFloat(binding.bottomMenu.root, "translationY", -140f, 0f).apply { duration = 500 }
 
         val adapter = Adapter()
         binding.collectionList.adapter = adapter

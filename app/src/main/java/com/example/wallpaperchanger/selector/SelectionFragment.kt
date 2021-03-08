@@ -7,18 +7,23 @@ import android.content.Context.MODE_PRIVATE
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
+import android.util.TypedValue
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.core.view.doOnPreDraw
+import androidx.core.view.marginBottom
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.selection.SelectionPredicates
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.selection.StorageStrategy
 import com.bumptech.glide.Glide
 import com.example.wallpaperchanger.Adapter
+import com.example.wallpaperchanger.R
 import com.example.wallpaperchanger.databinding.SelectionFragmentBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -38,12 +43,19 @@ class SelectionFragment : Fragment() {
         binding = SelectionFragmentBinding.inflate(inflater)
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
+        val menu = binding.bottomMenu.root
+
+        val fullPx = (3*resources.getDimensionPixelSize(R.dimen.text_size) + 6*resources.getDimensionPixelSize(R.dimen.small)).toFloat()
+        val partPx = (1*resources.getDimensionPixelSize(R.dimen.text_size) + 2*resources.getDimensionPixelSize(R.dimen.small)).toFloat()
+        val preHideM = ObjectAnimator.ofFloat(menu, "translationY", fullPx).apply { duration = 1 }
+        val showM = ObjectAnimator.ofFloat(menu, "translationY", fullPx, 0f).apply { duration = 500 }
+        val hideM = ObjectAnimator.ofFloat(menu, "translationY", fullPx).apply { duration = 500 }
+        val showOneM = ObjectAnimator.ofFloat(menu, "translationY", partPx, 0f).apply { duration = 400 }
+        val hideOneM = ObjectAnimator.ofFloat(menu, "translationY", partPx).apply { duration = 400 }
+        val hidePartM = ObjectAnimator.ofFloat(menu, "translationY", partPx, fullPx).apply { duration = 500 }
+        preHideM.start()
+
         val wpManager = WallpaperManager.getInstance(context)
-        val showM = ObjectAnimator.ofFloat(binding.bottomMenu.root, "translationY", -200f).apply { duration = 500 }
-        val hideM = ObjectAnimator.ofFloat(binding.bottomMenu.root, "translationY", -200f, 0f).apply { duration = 500 }
-        val showOneM = ObjectAnimator.ofFloat(binding.bottomMenu.root, "translationY", -140f, -200f).apply { duration = 400 }
-        val hideOneM = ObjectAnimator.ofFloat(binding.bottomMenu.root, "translationY", -200f, -140f).apply { duration = 400 }
-        val hidePartM = ObjectAnimator.ofFloat(binding.bottomMenu.root, "translationY", -140f, 0f).apply { duration = 500 }
         val imm = requireNotNull(activity).getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         val sharedPrefs = requireContext().getSharedPreferences("queryPrefs", MODE_PRIVATE)
         binding.editQuery.setText(sharedPrefs.getString("queryText", null))
