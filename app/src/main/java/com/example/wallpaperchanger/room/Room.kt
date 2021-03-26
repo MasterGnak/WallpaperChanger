@@ -24,6 +24,9 @@ interface ImageDao {
     fun clear()
 
     @Delete
+    fun removeDefective(images: List<EntityWallpaper>)
+
+    @Delete
     fun clearC(images: List<CollectionWallpaper>)
 
     @Query("SELECT * FROM wallpaper_table")

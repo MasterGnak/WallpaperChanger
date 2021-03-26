@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.WallpaperManager
 import android.content.Context
 import android.util.Log
+import androidx.annotation.VisibleForTesting
 import androidx.core.app.NotificationCompat
 import androidx.preference.PreferenceManager
 import androidx.work.CoroutineWorker
@@ -29,6 +30,9 @@ class WpWorker(appContext: Context, params: WorkerParameters) : Worker(appContex
 
     private val search = appContext.getString(R.string.search)
     private val collection = appContext.getString(R.string.collection)
+    @VisibleForTesting
+    private val list = inputData.getStringArray(LIST)
+
     private var colPos = 0
     private val wpManager = WallpaperManager.getInstance(appContext)
     private val database = getDatabase(applicationContext)
@@ -63,7 +67,7 @@ class WpWorker(appContext: Context, params: WorkerParameters) : Worker(appContex
                     else colPos++
                 }
             }
-            showNotification()
+            //showNotification()
             return Result.success()
         } catch (e: Exception) {
             Log.i("work", "work failed", e)

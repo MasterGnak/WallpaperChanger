@@ -17,13 +17,16 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.marginBottom
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.selection.SelectionPredicates
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.selection.StorageStrategy
 import com.bumptech.glide.Glide
 import com.example.wallpaperchanger.Adapter
+import com.example.wallpaperchanger.MainActivity
 import com.example.wallpaperchanger.R
+import com.example.wallpaperchanger.WpApplication
 import com.example.wallpaperchanger.databinding.SelectionFragmentBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -32,14 +35,15 @@ import kotlinx.coroutines.withContext
 
 class SelectionFragment : Fragment() {
 
-    private lateinit var viewModel: SelectionViewModel
+    private val viewModel by viewModels<SelectionViewModel> {
+        SelectionViewModel.SelectionViewModelFactory((requireContext().applicationContext as WpApplication).repository)
+    }
     private lateinit var binding: SelectionFragmentBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        viewModel = ViewModelProvider(this).get(SelectionViewModel::class.java)
+    ): View {
         binding = SelectionFragmentBinding.inflate(inflater)
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
@@ -122,14 +126,14 @@ class SelectionFragment : Fragment() {
             tracker.clearSelection()
         }
 
-        viewModel.count.observe(viewLifecycleOwner) {
-            binding.progressHorizontal.progress = it
-            if (it == viewModel.listSize.value) {
-                binding.invalidateAll()
-                viewModel.resetCount()
-                viewModel.toggleVisibility()
-            }
-        }
+//        viewModel.count.observe(viewLifecycleOwner) {
+//            binding.progressHorizontal.progress = it
+//            if (it == viewModel.listSize.value) {
+//                binding.invalidateAll()
+//                viewModel.resetCount()
+//                viewModel.toggleVisibility()
+//            }
+//        }
 
         binding.editQuery.setOnFocusChangeListener { editText: View, focused: Boolean ->
             if (focused) {

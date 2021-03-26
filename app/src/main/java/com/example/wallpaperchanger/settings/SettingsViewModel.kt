@@ -35,10 +35,11 @@ class SettingsViewModel(application: Application): AndroidViewModel(application)
             val repeatingRequest = PeriodicWorkRequestBuilder<WpWorker>(freq, TimeUnit.HOURS)
                 .setConstraints(constraints)
                 .setInputData(inputData)
+                .setInitialDelay(1, TimeUnit.HOURS)
                 .build()
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 WpWorker.WORK_NAME,
-                ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.REPLACE,
                 repeatingRequest)
         } else {
             workManager.cancelUniqueWork(WpWorker.WORK_NAME)

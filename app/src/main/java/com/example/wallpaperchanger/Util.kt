@@ -21,7 +21,7 @@ import com.example.wallpaperchanger.network.Wallpaper
 
 @BindingAdapter("image")
 fun bindImage(imgView: ImageView, image: Wallpaper) {
-        Glide.with(imgView.context).load(image.uri).into(imgView)
+    Glide.with(imgView.context).load(image.uri).into(imgView)
 }
 
 @BindingAdapter("imageList")
@@ -50,5 +50,5 @@ fun visibleAnim(progressBar: ProgressBar, hidden: Boolean) {
     }
 }
 
-lateinit var dirPath: String
+
 
