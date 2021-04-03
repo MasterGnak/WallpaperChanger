@@ -10,24 +10,13 @@
             android:background="@color/primaryColor"
     >
 
-        <ProgressBar
-                android:id="@+id/progress_horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                style="@android:style/Widget.Holo.ProgressBar.Horizontal"
-                app:visible="@{viewModel.hidden}"
-                android:max="35"
-                android:progressTint="@color/secondaryColor"
-        />
-
         <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/selection_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                app:spanCount="2"
                 app:imageList="@{viewModel.images}"
-                app:visible="@{viewModel.hidden}"
                 app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
         />
 
@@ -38,7 +27,6 @@
                  android:layout_gravity="bottom"
 
         />
-<!--        android:layout_marginBottom="@dimen/menu_margin"-->
 
         <com.google.android.material.appbar.AppBarLayout
                 android:id="@+id/app_bar"

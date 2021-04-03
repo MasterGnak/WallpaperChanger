@@ -9,10 +9,10 @@ import com.example.wallpaperchanger.network.EntityWallpaper
 @Dao
 interface ImageDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(images: List<EntityWallpaper>)
+    suspend fun insertAll(images: List<EntityWallpaper>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAllC(images: List<CollectionWallpaper>)
+    suspend fun insertAllC(images: List<CollectionWallpaper>)
 
     @Query("DELETE FROM wallpaper_table WHERE imageId = :imageId")
     suspend fun remove(imageId: String)
@@ -21,13 +21,10 @@ interface ImageDao {
     suspend fun removeC(imageId: String)
 
     @Query("DELETE FROM wallpaper_table")
-    fun clear()
+    suspend fun clear()
 
     @Delete
-    fun removeDefective(images: List<EntityWallpaper>)
-
-    @Delete
-    fun clearC(images: List<CollectionWallpaper>)
+    suspend fun clearC(images: List<CollectionWallpaper>)
 
     @Query("SELECT * FROM wallpaper_table")
     fun getAll(): LiveData<List<EntityWallpaper>>
@@ -41,13 +38,9 @@ interface ImageDao {
     @Query("SELECT * FROM collection_table")
     fun getAllCNotLive(): List<CollectionWallpaper>
 
-    @Query("SELECT count(*) FROM wallpaper_table")
-    fun getCount(): Int
-
-
 }
 
-@Database(entities = [EntityWallpaper::class, CollectionWallpaper::class], version = 101)
+@Database(entities = [EntityWallpaper::class, CollectionWallpaper::class], version = 10000, exportSchema = false)
 abstract class ImageDatabase: RoomDatabase() {
     abstract val imageDao: ImageDao
 }

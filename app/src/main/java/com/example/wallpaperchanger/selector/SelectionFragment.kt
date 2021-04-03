@@ -49,8 +49,10 @@ class SelectionFragment : Fragment() {
         binding.viewModel = viewModel
         val menu = binding.bottomMenu.root
 
-        val fullPx = (3*resources.getDimensionPixelSize(R.dimen.text_size) + 6*resources.getDimensionPixelSize(R.dimen.small)).toFloat()
-        val partPx = (1*resources.getDimensionPixelSize(R.dimen.text_size) + 2*resources.getDimensionPixelSize(R.dimen.small)).toFloat()
+        val fullPx =
+            (3 * resources.getDimensionPixelSize(R.dimen.text_size) + 6 * resources.getDimensionPixelSize(R.dimen.small)).toFloat()
+        val partPx =
+            (1 * resources.getDimensionPixelSize(R.dimen.text_size) + 2 * resources.getDimensionPixelSize(R.dimen.small)).toFloat()
         val preHideM = ObjectAnimator.ofFloat(menu, "translationY", fullPx).apply { duration = 1 }
         val showM = ObjectAnimator.ofFloat(menu, "translationY", fullPx, 0f).apply { duration = 500 }
         val hideM = ObjectAnimator.ofFloat(menu, "translationY", fullPx).apply { duration = 500 }
@@ -105,16 +107,9 @@ class SelectionFragment : Fragment() {
         adapter.setTracker(tracker)
 
         binding.bottomMenu.setAsWp.setOnClickListener {
-            MainScope().launch {
-                hideM.start()
-                viewModel.menuOpened = false
-                Toast.makeText(context, "Обои обновлены", Toast.LENGTH_SHORT).show()
-                withContext(Dispatchers.IO) {
-                    val bitmap = Glide.with(requireContext()).asBitmap().load(adapter.getSingleSelection().uri).submit()
-                    wpManager.setBitmap(bitmap.get())
-                }
-                tracker.clearSelection()
-            }
+            viewModel.updateWp(adapter.getSingleSelection(), requireContext())
+            Toast.makeText(context, "Обои обновляются, не выключайте приложение...", Toast.LENGTH_LONG).show()
+            tracker.clearSelection()
         }
 
         binding.bottomMenu.clearSelection.setOnClickListener {
@@ -125,15 +120,6 @@ class SelectionFragment : Fragment() {
             viewModel.addToCollection(adapter.getMultipleSelection())
             tracker.clearSelection()
         }
-
-//        viewModel.count.observe(viewLifecycleOwner) {
-//            binding.progressHorizontal.progress = it
-//            if (it == viewModel.listSize.value) {
-//                binding.invalidateAll()
-//                viewModel.resetCount()
-//                viewModel.toggleVisibility()
-//            }
-//        }
 
         binding.editQuery.setOnFocusChangeListener { editText: View, focused: Boolean ->
             if (focused) {

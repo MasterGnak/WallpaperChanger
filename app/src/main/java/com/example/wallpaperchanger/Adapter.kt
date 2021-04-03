@@ -15,19 +15,10 @@ import com.example.wallpaperchanger.network.Wallpaper
 
 class Adapter(): ListAdapter<Wallpaper, Adapter.ViewHolder>(DiffCallback) {
 
-    val keyMap = HashMap<String, Int>()
-
     private lateinit var tracker: SelectionTracker<String>
 
     fun setTracker(selector: SelectionTracker<String>) {
         tracker = selector
-    }
-
-    fun updateMap() {
-        keyMap.clear()
-        for (i in currentList.indices) {
-            keyMap[currentList[i].imageId] = i
-        }
     }
 
     fun getItemKey(position: Int): String {
@@ -73,7 +64,7 @@ class Adapter(): ListAdapter<Wallpaper, Adapter.ViewHolder>(DiffCallback) {
         }
 
         override fun areContentsTheSame(oldItem: Wallpaper, newItem: Wallpaper): Boolean {
-            return oldItem.imageId == newItem.imageId //&& oldItem.loaded == newItem.loaded
+            return oldItem.imageId == newItem.imageId
         }
 
     }
@@ -103,7 +94,7 @@ class Adapter(): ListAdapter<Wallpaper, Adapter.ViewHolder>(DiffCallback) {
         }
 
         override fun getPosition(key: String): Int {
-            return adapter.keyMap[key]!!
+            return adapter.currentList.mapIndexed{idx, wp -> wp.imageId to idx}.toMap()[key]!!
         }
     }
 
@@ -122,7 +113,7 @@ class Adapter(): ListAdapter<Wallpaper, Adapter.ViewHolder>(DiffCallback) {
     fun getSingleSelection(): Wallpaper {
         lateinit var selectedWp: Wallpaper
         tracker.selection.forEach {
-            selectedWp = getItem(keyMap[it]!!)
+            selectedWp = getItem(currentList.mapIndexed{idx, wp -> wp.imageId to idx}.toMap()[it]!!)
         }
         return selectedWp
     }
@@ -130,7 +121,7 @@ class Adapter(): ListAdapter<Wallpaper, Adapter.ViewHolder>(DiffCallback) {
     fun getMultipleSelection(): List<Wallpaper> {
         val list = mutableListOf<Wallpaper>()
         tracker.selection.forEach {
-            list.add(getItem(keyMap[it]!!))
+            list.add(getItem(currentList.mapIndexed{idx, wp -> wp.imageId to idx}.toMap()[it]!!))
         }
         return list
     }

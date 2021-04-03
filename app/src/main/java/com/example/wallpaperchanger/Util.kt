@@ -17,38 +17,29 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.example.wallpaperchanger.network.Wallpaper
+import java.io.File
 
 
 @BindingAdapter("image")
 fun bindImage(imgView: ImageView, image: Wallpaper) {
-    Glide.with(imgView.context).load(image.uri).into(imgView)
+    val file = File(dirPath + image.imageId)
+    val uri = if (file.exists()) {
+        Uri.fromFile(file)
+    } else {
+        image.url.toUri().buildUpon().scheme("https").build()
+    }
+    Glide.with(imgView.context).load(uri).apply (
+        RequestOptions().placeholder(R.drawable.loading_animation).error(R.drawable.ic_broken_image)
+    ).into(imgView)
 }
 
 @BindingAdapter("imageList")
 fun listImages(recyclerView: RecyclerView, list: List<Wallpaper>?) {
     val adapter = recyclerView.adapter as Adapter
     adapter.submitList(list)
-    adapter.updateMap()
     Log.i("loading", "list is empty or null: ${list.isNullOrEmpty()} ${list?.size}")
 }
 
-@BindingAdapter("visible")
-fun visible(recyclerView: RecyclerView, hidden: Boolean) {
-    if (hidden) {
-        recyclerView.visibility = View.GONE
-    } else {
-        recyclerView.visibility = View.VISIBLE
-    }
-}
-
-@BindingAdapter("visible")
-fun visibleAnim(progressBar: ProgressBar, hidden: Boolean) {
-    if (!hidden) {
-        progressBar.visibility = View.GONE
-    } else {
-        progressBar.visibility = View.VISIBLE
-    }
-}
 
 
 

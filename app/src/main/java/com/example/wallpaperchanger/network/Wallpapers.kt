@@ -17,7 +17,7 @@ data class NetworkWallpaper(
 
 data class Wallpaper(
     val imageId: String,
-    val uri: Uri
+    val url: String
 ) {
     override fun equals(other: Any?): Boolean {
         return when (other) {
@@ -31,7 +31,8 @@ data class Wallpaper(
 @Entity(tableName = "wallpaper_table")
 data class EntityWallpaper(
     @PrimaryKey
-    val imageId: String
+    val imageId: String,
+    val url: String
 ) {
     override fun equals(other: Any?): Boolean {
         return when (other) {
@@ -45,7 +46,8 @@ data class EntityWallpaper(
 @Entity(tableName = "collection_table")
 data class CollectionWallpaper(
     @PrimaryKey
-    val imageId: String
+    val imageId: String,
+    val url: String
 ) {
     override fun equals(other: Any?): Boolean {
         return when (other) {
@@ -60,7 +62,7 @@ fun List<EntityWallpaper>.asWallpapers(): List<Wallpaper> {
     return map {
         Wallpaper(
             imageId = it.imageId,
-            uri = Uri.fromFile(File(dirPath + it.imageId))
+            url = it.url
         )
     }
 }
@@ -69,7 +71,7 @@ fun List<CollectionWallpaper>.asWallpapersC(): List<Wallpaper> {
     return map {
         Wallpaper(
             imageId = it.imageId,
-            uri = Uri.fromFile(File(dirPath + it.imageId))
+            url = it.url
         )
 
     }

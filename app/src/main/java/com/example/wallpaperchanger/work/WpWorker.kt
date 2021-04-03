@@ -7,6 +7,7 @@ import android.content.Context
 import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.core.app.NotificationCompat
+import androidx.core.net.toUri
 import androidx.preference.PreferenceManager
 import androidx.work.CoroutineWorker
 import androidx.work.Worker
@@ -20,6 +21,7 @@ import com.example.wallpaperchanger.repository.Repository
 import com.example.wallpaperchanger.room.getDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlin.random.Random
 
 const val SWITCH = "switch"
 const val LIST = "list"
@@ -33,58 +35,38 @@ class WpWorker(appContext: Context, params: WorkerParameters) : Worker(appContex
     @VisibleForTesting
     private val list = inputData.getStringArray(LIST)
 
-    private var colPos = 0
     private val wpManager = WallpaperManager.getInstance(appContext)
-    private val database = getDatabase(applicationContext)
-    private val prefs = PreferenceManager.getDefaultSharedPreferences(appContext)
-    private val repo = Repository(database, appContext)
+    private val database = getDatabase(appContext)
+    //private val repo = Repository(database, appContext)
 
     companion object {
         const val WORK_NAME = "WpWorker"
     }
 
     override fun doWork(): Result {
-        Log.i("work", "work attempted")
         try {
             val list = inputData.getString(LIST)
-            val listPos = prefs.getInt(LISTPOS, 0)
             if (list == search) {
                 val images = database.imageDao.getAllNotLive().asWallpapers()
-                Log.i("work", "list is null or empty ${images.isNullOrEmpty()}")
+                val listPos = Random.nextInt(0, images.size)
                 if (!images.isNullOrEmpty()) {
-                    val bitmap = Glide.with(applicationContext).asBitmap().load(images[listPos].uri).submit()
+                    val uri = images[listPos].url.toUri().buildUpon().scheme("https").build()
+                    val bitmap = Glide.with(applicationContext).asBitmap().load(uri).submit()
                     wpManager.setBitmap(bitmap.get())
-                    Log.i("work", "wp updated with position $listPos")
-                    if (listPos == images.lastIndex) prefs.edit().putInt(LISTPOS, 0).commit()
-                    else prefs.edit().putInt(LISTPOS, listPos+1).commit()
                 }
             } else if (list == collection) {
                 val col = database.imageDao.getAllCNotLive().asWallpapersC()
+                val colPos = Random.nextInt(0, col.size)
                 if (!col.isNullOrEmpty()) {
-                    val bitmap = Glide.with(applicationContext).asBitmap().load(col[colPos].uri).submit()
+                    val uri = col[colPos].url.toUri().buildUpon().scheme("https").build()
+                    val bitmap = Glide.with(applicationContext).asBitmap().load(uri).submit()
                     wpManager.setBitmap(bitmap.get())
-                    if (colPos == col.lastIndex) colPos = 0
-                    else colPos++
                 }
             }
-            //showNotification()
             return Result.success()
         } catch (e: Exception) {
-            Log.i("work", "work failed", e)
             return Result.failure()
         }
     }
 
-    private fun showNotification() {
-        val channel = NotificationChannel(CHANNEL_ID, "chan", NotificationManager.IMPORTANCE_DEFAULT)
-        val notificationManager: NotificationManager =
-            applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(channel)
-        val builder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
-            .setContentTitle("This is a test")
-            .setSmallIcon(R.drawable.loading_img)
-            .setContentText("Test")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-        notificationManager.notify(1, builder.build())
-    }
 }
