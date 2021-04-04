@@ -1,29 +1,30 @@
 package com.example.wallpaperchanger.settings
 
 import android.app.Application
-import android.util.Log
+import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.preference.PreferenceManager
 import androidx.work.*
 import com.example.wallpaperchanger.R
-import com.example.wallpaperchanger.work.*
+import com.example.wallpaperchanger.work.FREQ
+import com.example.wallpaperchanger.work.LIST
+import com.example.wallpaperchanger.work.SWITCH
+import com.example.wallpaperchanger.work.WpWorker
 import java.util.concurrent.TimeUnit
-
 
 
 class SettingsViewModel(application: Application): AndroidViewModel(application) {
 
-    private val context = application.applicationContext
-    private val search = context.getString(R.string.search)
-    private val collection = context.getString(R.string.collection)
+    private val search = application.getString(R.string.search)
+    private val collection = application.getString(R.string.collection)
 
-    private val workManager = WorkManager.getInstance(context)
-    private val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+    private val workManager = WorkManager.getInstance(application)
+    private val prefs = PreferenceManager.getDefaultSharedPreferences(application)
     var switch = prefs.getBoolean(SWITCH, false)
     var list = prefs.getString(LIST, search)
     var freq = prefs.getInt(FREQ, 4).toLong()
 
-    fun setupWork() {
+    fun setupWork(context: Context) {
         if (switch) {
             val inputData = workDataOf(LIST to list)
             val constraints = Constraints.Builder()

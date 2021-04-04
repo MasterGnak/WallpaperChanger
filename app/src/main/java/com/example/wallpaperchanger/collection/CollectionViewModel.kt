@@ -9,12 +9,9 @@ import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
+import com.example.wallpaperchanger.ServiceLocator
 import com.example.wallpaperchanger.dirPath
-import com.example.wallpaperchanger.network.CollectionWallpaper
-import com.example.wallpaperchanger.network.EntityWallpaper
 import com.example.wallpaperchanger.network.Wallpaper
-import com.example.wallpaperchanger.repository.Repository
-import com.example.wallpaperchanger.room.getDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -22,8 +19,7 @@ import java.io.File
 
 class CollectionViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val database = getDatabase(application.applicationContext)
-    private val repository = Repository(database, application.applicationContext)
+    private val repository = ServiceLocator.provideRepository(application)
 
     val images = repository.imagesC
 

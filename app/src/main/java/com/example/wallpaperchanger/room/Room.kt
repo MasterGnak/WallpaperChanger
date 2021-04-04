@@ -1,6 +1,5 @@
 package com.example.wallpaperchanger.room
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.wallpaperchanger.network.CollectionWallpaper
@@ -43,17 +42,4 @@ interface ImageDao {
 @Database(entities = [EntityWallpaper::class, CollectionWallpaper::class], version = 10000, exportSchema = false)
 abstract class ImageDatabase: RoomDatabase() {
     abstract val imageDao: ImageDao
-}
-
-private lateinit var INSTANCE: ImageDatabase
-
-fun getDatabase(context: Context): ImageDatabase {
-    synchronized(ImageDatabase::class.java) {
-        if (!::INSTANCE.isInitialized) {
-            INSTANCE = Room.databaseBuilder(context.applicationContext,
-                ImageDatabase::class.java,
-            "images").fallbackToDestructiveMigration().build()
-        }
-    }
-    return INSTANCE
 }

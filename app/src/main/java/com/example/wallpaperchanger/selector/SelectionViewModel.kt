@@ -1,25 +1,20 @@
 package com.example.wallpaperchanger.selector
 
-import android.app.Application
 import android.app.WallpaperManager
 import android.content.Context
 import android.net.Uri
 import android.widget.Toast
 import androidx.core.net.toUri
-
-import androidx.lifecycle.*
-import androidx.recyclerview.selection.Selection
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
 import com.example.wallpaperchanger.dirPath
-import com.example.wallpaperchanger.network.EntityWallpaper
 import com.example.wallpaperchanger.network.Wallpaper
-import com.example.wallpaperchanger.network.asWallpapers
-import com.example.wallpaperchanger.network.asWallpapersC
-import com.example.wallpaperchanger.repository.Repository
 import com.example.wallpaperchanger.repository.RepositoryInterface
-import com.example.wallpaperchanger.room.getDatabase
-import kotlinx.coroutines.*
-import org.apache.commons.io.FileUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class SelectionViewModel(private val repository: RepositoryInterface) : ViewModel() {

@@ -1,29 +1,19 @@
 package com.example.wallpaperchanger.repository
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
-import android.net.Uri
-import android.os.Environment
-import android.util.Log
-import androidx.core.graphics.drawable.toBitmap
-import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import androidx.work.*
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
-import com.example.wallpaperchanger.R
+import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.wallpaperchanger.dirPath
 import com.example.wallpaperchanger.network.*
 import com.example.wallpaperchanger.room.ImageDatabase
 import com.example.wallpaperchanger.work.FileWorker
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileOutputStream
-import java.lang.Exception
 
 class Repository(private val database: ImageDatabase, private val context: Context) : RepositoryInterface {
 
@@ -34,6 +24,10 @@ class Repository(private val database: ImageDatabase, private val context: Conte
     override val imagesC = Transformations.map(database.imageDao.getAllC()) {
         it.asWallpapersC()
     }
+
+    override fun getWallpapers() = database.imageDao.getAllNotLive().asWallpapers()
+
+    override fun getWallpapersC() = database.imageDao.getAllCNotLive().asWallpapersC()
 
     override suspend fun downloadWallpapers(query: String) {
         clear()

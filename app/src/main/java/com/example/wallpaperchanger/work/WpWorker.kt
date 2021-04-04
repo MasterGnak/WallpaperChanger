@@ -1,43 +1,28 @@
 package com.example.wallpaperchanger.work
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.WallpaperManager
 import android.content.Context
-import android.util.Log
-import androidx.annotation.VisibleForTesting
-import androidx.core.app.NotificationCompat
-import androidx.core.net.toUri
-import androidx.preference.PreferenceManager
-import androidx.work.CoroutineWorker
+import android.graphics.BitmapFactory
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.bumptech.glide.Glide
 import com.example.wallpaperchanger.R
-import com.example.wallpaperchanger.network.Wallpaper
-import com.example.wallpaperchanger.network.asWallpapers
-import com.example.wallpaperchanger.network.asWallpapersC
-import com.example.wallpaperchanger.repository.Repository
-import com.example.wallpaperchanger.room.getDatabase
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.example.wallpaperchanger.ServiceLocator
+import com.example.wallpaperchanger.dirPath
+import java.io.File
 import kotlin.random.Random
 
 const val SWITCH = "switch"
 const val LIST = "list"
 const val FREQ = "frequency"
-const val LISTPOS = "listPos"
 
 class WpWorker(appContext: Context, params: WorkerParameters) : Worker(appContext, params) {
 
     private val search = appContext.getString(R.string.search)
     private val collection = appContext.getString(R.string.collection)
-    @VisibleForTesting
-    private val list = inputData.getStringArray(LIST)
+    private val path = dirPath
 
     private val wpManager = WallpaperManager.getInstance(appContext)
-    private val database = getDatabase(appContext)
-    //private val repo = Repository(database, appContext)
+    private val repository = ServiceLocator.provideRepository(appContext)
 
     companion object {
         const val WORK_NAME = "WpWorker"
@@ -47,21 +32,17 @@ class WpWorker(appContext: Context, params: WorkerParameters) : Worker(appContex
         try {
             val list = inputData.getString(LIST)
             if (list == search) {
-                val images = database.imageDao.getAllNotLive().asWallpapers()
-                val listPos = Random.nextInt(0, images.size)
-                if (!images.isNullOrEmpty()) {
-                    val uri = images[listPos].url.toUri().buildUpon().scheme("https").build()
-                    val bitmap = Glide.with(applicationContext).asBitmap().load(uri).submit()
-                    wpManager.setBitmap(bitmap.get())
-                }
+                val images = repository.getWallpapers()
+                val image = images[Random.nextInt(0, images.size)]
+                val file = File(path + image.imageId)
+                val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+                wpManager.setBitmap(bitmap)
             } else if (list == collection) {
-                val col = database.imageDao.getAllCNotLive().asWallpapersC()
-                val colPos = Random.nextInt(0, col.size)
-                if (!col.isNullOrEmpty()) {
-                    val uri = col[colPos].url.toUri().buildUpon().scheme("https").build()
-                    val bitmap = Glide.with(applicationContext).asBitmap().load(uri).submit()
-                    wpManager.setBitmap(bitmap.get())
-                }
+                val col = repository.getWallpapersC()
+                val image = col[Random.nextInt(0, col.size)]
+                val file = File(path + image.imageId)
+                val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+                wpManager.setBitmap(bitmap)
             }
             return Result.success()
         } catch (e: Exception) {

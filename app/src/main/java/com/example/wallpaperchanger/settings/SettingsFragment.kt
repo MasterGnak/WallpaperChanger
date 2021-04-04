@@ -6,7 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
-import androidx.preference.*
+import androidx.preference.ListPreference
+import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SeekBarPreference
+import androidx.preference.SwitchPreferenceCompat
 import com.example.wallpaperchanger.R
 
 class SettingsFragment : PreferenceFragmentCompat() {
@@ -25,7 +28,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             isSingleLineTitle = false
             setOnPreferenceChangeListener { preference, newValue ->
                 viewModel.switch = newValue as Boolean
-                viewModel.setupWork()
+                viewModel.setupWork(context)
                 true
             }
         }
@@ -40,7 +43,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             isSingleLineTitle = false
             setOnPreferenceChangeListener { preference, newValue ->
                 viewModel.list = newValue as String
-                viewModel.setupWork()
+                viewModel.setupWork(context)
                 true
             }
         }
@@ -55,7 +58,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             showSeekBarValue = true
             setOnPreferenceChangeListener { preference, newValue ->
                 viewModel.freq = (newValue as Int).toLong()
-                viewModel.setupWork()
+                viewModel.setupWork(context)
                 true
             }
         }
