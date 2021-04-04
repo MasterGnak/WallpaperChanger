@@ -1,71 +1,73 @@
 package com.example.wallpaperchanger.selector
 
-import android.app.Application
-import androidx.lifecycle.*
-import com.example.wallpaperchanger.repository.Repository
-import com.example.wallpaperchanger.room.getDatabase
+import android.app.WallpaperManager
+import android.content.Context
+import android.net.Uri
+import android.widget.Toast
+import androidx.core.net.toUri
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.bumptech.glide.Glide
+import com.example.wallpaperchanger.dirPath
+import com.example.wallpaperchanger.network.Wallpaper
+import com.example.wallpaperchanger.repository.RepositoryInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
-class SelectionViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val database = getDatabase(application.applicationContext)
-    private val repository = Repository(database, application.applicationContext)
-
-    private val _hidden = MutableLiveData(false)
-    val hidden: LiveData<Boolean>
-        get() = _hidden
+class SelectionViewModel(private val repository: RepositoryInterface) : ViewModel() {
 
     val images = repository.images
-    val listSize = repository.listSize
-    val count = repository.count
 
-    fun toggleVisibility() {
-        _hidden.value = !_hidden.value!!
-    }
-
-    fun resetCount() {
-        count.value = 0
-        viewModelScope.launch {
-            repository.insertWp()
-        }
-    }
-
-    private val _menuOpened = MutableLiveData(false)
-    val menuOpened: LiveData<Boolean>
-        get() = _menuOpened
-
-    fun showMenu() {
-        _menuOpened.value = true
-    }
-
-    fun hideMenu() {
-        _menuOpened.value = false
-    }
+    var menuOpened = false
+    var severalSelected = false
 
     fun downloadWp(query: String) {
         viewModelScope.launch {
-            toggleVisibility()
-            clear()
             repository.downloadWallpapers(query)
         }
     }
 
-    init {
-//        if (images.value.isNullOrEmpty()) {
-//            viewModelScope.launch {
-//                clear()
-//                repository.downloadWallpapers()
-//            }
-//        } else {
-//            toggleVisibility()
-//        }
+    fun addToCollection(selection: List<Wallpaper>) {
+        viewModelScope.launch {
+            repository.addToCollection(selection)
+        }
     }
 
-    private suspend fun clear() {
+    fun updateWp(wallpaper: Wallpaper, context: Context) {
+        viewModelScope.launch {
+            update(wallpaper, context)
+        }
+    }
+
+    private suspend fun update(wallpaper: Wallpaper, context: Context) {
         withContext(Dispatchers.IO) {
-            database.imageDao.clear()
+            val file = File(dirPath + wallpaper.imageId)
+            val uri = if (file.exists()) {
+                Uri.fromFile(file)
+            } else {
+                wallpaper.url.toUri().buildUpon()?.scheme("https")?.build()
+            }
+            try {
+                val bitmap = Glide.with(context).asBitmap().load(uri).submit()
+                WallpaperManager.getInstance(context).setBitmap(bitmap.get())
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Обои обновлены", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Ошибка при обновлении обоев", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    class SelectionViewModelFactory (private val repository: RepositoryInterface): ViewModelProvider.NewInstanceFactory() {
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return (SelectionViewModel(repository) as T)
         }
     }
 }

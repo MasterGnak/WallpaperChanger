@@ -2,6 +2,7 @@ package com.example.wallpaperchanger
 
 
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
@@ -16,42 +17,20 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.example.wallpaperchanger.network.Wallpaper
+import java.io.File
 
 
 @BindingAdapter("image")
-fun bindImage(imgView: ImageView, image: Wallpaper?) {
-    image?.let {
-        if (it.loaded != false) {
-            val imgUri = image.contentUrl.toUri().buildUpon().scheme("https").build()
-            Glide.with(imgView.context)
-                .load(imgUri)
-                .listener(object: RequestListener<Drawable> {
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        Log.e("loading", "load failed", e)
-                        image.loaded = false
-                        return false
-                    }
-
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        return false
-                    }
-
-                })
-                .apply(RequestOptions())
-                .into(imgView)
-        }
+fun bindImage(imgView: ImageView, image: Wallpaper) {
+    val file = File(dirPath + image.imageId)
+    val uri = if (file.exists()) {
+        Uri.fromFile(file)
+    } else {
+        image.url.toUri().buildUpon().scheme("https").build()
     }
+    Glide.with(imgView.context).load(uri).apply (
+        RequestOptions().placeholder(R.drawable.loading_animation).error(R.drawable.ic_broken_image)
+    ).into(imgView)
 }
 
 @BindingAdapter("imageList")
@@ -61,30 +40,6 @@ fun listImages(recyclerView: RecyclerView, list: List<Wallpaper>?) {
     Log.i("loading", "list is empty or null: ${list.isNullOrEmpty()} ${list?.size}")
 }
 
-@BindingAdapter("visible")
-fun visible(recyclerView: RecyclerView, hidden: Boolean) {
-    if (hidden) {
-        recyclerView.visibility = View.GONE
-    } else {
-        recyclerView.visibility = View.VISIBLE
-    }
-}
 
-@BindingAdapter("visible")
-fun visibleAnim(imageView: ImageView, hidden: Boolean) {
-    if (!hidden) {
-        imageView.visibility = View.GONE
-    } else {
-        imageView.visibility = View.VISIBLE
-    }
-}
 
-@BindingAdapter("visible")
-fun visibleAnim(progressBar: ProgressBar, hidden: Boolean) {
-    if (!hidden) {
-        progressBar.visibility = View.GONE
-    } else {
-        progressBar.visibility = View.VISIBLE
-    }
-}
 

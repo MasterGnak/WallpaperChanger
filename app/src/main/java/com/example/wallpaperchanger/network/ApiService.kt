@@ -1,5 +1,7 @@
 package com.example.wallpaperchanger.network
 
+import com.example.wallpaperchanger.BuildConfig
+import com.example.wallpaperchanger.R
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.Retrofit
@@ -21,7 +23,7 @@ private val retrofit = Retrofit.Builder()
     .build()
 
 interface ApiService {
-    @Headers("Ocp-Apim-Subscription-Key:db6bc20543ef4a9f914fb7bfe39bd1eb")
+    @Headers("Ocp-Apim-Subscription-Key:${BuildConfig.API_KEY}")
     @GET("v7.0/images/search")
     suspend fun getImages(
         @Query("q") searchRequest: String,

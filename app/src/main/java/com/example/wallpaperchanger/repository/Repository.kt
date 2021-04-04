@@ -1,117 +1,78 @@
 package com.example.wallpaperchanger.repository
 
 import android.content.Context
-import android.graphics.drawable.Drawable
-import android.util.Log
-import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.target.Target
-import com.bumptech.glide.request.transition.Transition
+import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import com.example.wallpaperchanger.dirPath
 import com.example.wallpaperchanger.network.*
 import com.example.wallpaperchanger.room.ImageDatabase
+import com.example.wallpaperchanger.work.FileWorker
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
-class Repository(private val database: ImageDatabase, private val context: Context) {
+class Repository(private val database: ImageDatabase, private val context: Context) : RepositoryInterface {
 
-
-    private var databaseSource = true
-
-    val images = MediatorLiveData<List<Wallpaper>>()
-
-    private val databaseImages = Transformations.map(database.imageDao.getAll()) {
-        it.asWallpaper()
+    override val images: LiveData<List<Wallpaper>> = Transformations.map(database.imageDao.getAll()) {
+        it.asWallpapers()
     }
 
-    private val downloadedImages = MutableLiveData<MutableList<Wallpaper>>(mutableListOf())
-
-    var listSize = MutableLiveData(-1)
-
-    var count = MutableLiveData(0)
-
-    init {
-        images.addSource(databaseImages) { images.value = it }
+    override val imagesC = Transformations.map(database.imageDao.getAllC()) {
+        it.asWallpapersC()
     }
 
+    override fun getWallpapers() = database.imageDao.getAllNotLive().asWallpapers()
 
-    fun increment(wp: Wallpaper?) {
-        MainScope().launch {
-            count.value = count.value?.plus(1)
-            if (wp != null) {
-                downloadedImages.value!!.add(wp)
-//                withContext(Dispatchers.IO) {
-//                    database.imageDao.insertOne(wp)
-//                }
+    override fun getWallpapersC() = database.imageDao.getAllCNotLive().asWallpapersC()
+
+    override suspend fun downloadWallpapers(query: String) {
+        clear()
+        val wallpapers = Api.retrofitService.getImages(query, "Wallpaper", "Tall", 36)
+        val entityWallpapers = wallpapers.map { EntityWallpaper(it.imageId, it.contentUrl) }
+        database.imageDao.insertAll(entityWallpapers)
+        val inputData = Data.Builder().putAll(entityWallpapers.associateBy({ it.imageId }, { it.url })).build()
+        val request = OneTimeWorkRequestBuilder<FileWorker>().setInputData(inputData).build()
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            FileWorker.WORK_NAME,
+            ExistingWorkPolicy.REPLACE,
+            request
+        )
+    }
+
+    override suspend fun addToCollection(selection: List<Wallpaper>) {
+        database.imageDao.insertAllC(
+            selection.map {
+                CollectionWallpaper(it.imageId, it.url)
             }
-        }
+        )
+
     }
 
-    suspend fun insertWp() {
+    override suspend fun clear() {
         withContext(Dispatchers.IO) {
-            database.imageDao.insertAll(downloadedImages.value!!.asEntityWps())
+            val list = database.imageDao.getAll().value
+            val collection = database.imageDao.getAllC().value
+            list?.minus(collection)?.forEach {
+                File(dirPath, (it as EntityWallpaper).imageId).delete()
+            }
+            database.imageDao.clear()
         }
     }
 
-    suspend fun NetworkWallpaper.validate(context: Context) {
+    override suspend fun clearC(collection: List<Wallpaper>) {
         withContext(Dispatchers.IO) {
-            val imgUri = this@validate.contentUrl.toUri().buildUpon().scheme("https").build()
-            val img = Glide.with(context).load(imgUri).listener(object : RequestListener<Drawable> {
-                override fun onLoadFailed(
-                    e: GlideException?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    increment(null)
-                    return false
-                }
-
-                override fun onResourceReady(
-                    resource: Drawable?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    dataSource: DataSource?,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    increment(this@validate.asWallpaper())
-                    return false
-                }
-            }).submit()
+            val list = database.imageDao.getAll().value
+            collection.minus(list).forEach {
+                File(dirPath, (it as Wallpaper).imageId).delete()
+            }
+            database.imageDao.clearC(collection.map {
+                CollectionWallpaper(it.imageId, it.url)
+            })
         }
     }
 
-    suspend fun downloadWallpapers(query: String) {
-        downloadedImages.value = mutableListOf()
-        val wallpapers = Api.retrofitService.getImages(query, "Wallpaper", "Tall", 100)
-        if (databaseSource) {
-            images.removeSource(databaseImages)
-            images.addSource(downloadedImages) {images.value = it}
-            databaseSource = false
-        }
-        listSize.value = wallpapers.size
-        for (wp in wallpapers) {
-            wp.validate(context)
-        }
-    }
-}
-
-class WpTarget: CustomTarget<Drawable>() {
-
-    override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onLoadCleared(placeholder: Drawable?) {
-        TODO("Not yet implemented")
-    }
 }

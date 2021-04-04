@@ -1,30 +1,28 @@
 package com.example.wallpaperchanger
 
-import android.graphics.Bitmap
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.ViewGroup
-import androidx.core.graphics.drawable.toBitmap
 import androidx.recyclerview.selection.ItemDetailsLookup
 import androidx.recyclerview.selection.ItemKeyProvider
-import androidx.recyclerview.selection.ItemKeyProvider.SCOPE_CACHED
+import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wallpaperchanger.databinding.GridItemBinding
 import com.example.wallpaperchanger.network.Wallpaper
-import kotlinx.android.synthetic.main.grid_item.view.*
 
 class Adapter(): ListAdapter<Wallpaper, Adapter.ViewHolder>(DiffCallback) {
 
-    private lateinit var clickListener: ClickListener
+    private lateinit var tracker: SelectionTracker<String>
 
-    fun setClickListener(listener: ClickListener) {
-        clickListener = listener
+    fun setTracker(selector: SelectionTracker<String>) {
+        tracker = selector
     }
 
-    override fun getItemId(position: Int): Long {
-        return getItem(position).imageId.toLong()
+    fun getItemKey(position: Int): String {
+        return getItem(position).imageId
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -33,12 +31,7 @@ class Adapter(): ListAdapter<Wallpaper, Adapter.ViewHolder>(DiffCallback) {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val image = getItem(position)
-        holder.bind(image)
-        holder.itemView.setOnClickListener{
-            if (holder.itemView.item_image.drawable != null) {
-                clickListener.onClick(holder.itemView.item_image.drawable.toBitmap())
-            }
-        }
+        holder.bind(image, tracker.isSelected(getItemKey(position)))
     }
 
     class ViewHolder private constructor(private val binding: GridItemBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -51,22 +44,18 @@ class Adapter(): ListAdapter<Wallpaper, Adapter.ViewHolder>(DiffCallback) {
             }
         }
 
-        fun bind(image: Wallpaper) {
+        fun bind(image: Wallpaper, isSelected: Boolean) {
+            binding.itemFrame.isActivated = isSelected
             binding.image = image
             details.key = image.imageId
             binding.executePendingBindings()
         }
 
-        fun getItemDetails(): ItemDetailsLookup.ItemDetails<Long> {
-            details.pos = layoutPosition
+        fun getItemDetails(): ItemDetailsLookup.ItemDetails<String> {
+            details.pos = adapterPosition
             return details
         }
 
-    }
-
-    class ClickListener(val onClickListener: (bm: Bitmap) -> Unit) {
-        //fun onClick(wp: Wallpaper) = onClickListener(wp)
-        fun onClick(bitmap: Bitmap) = onClickListener(bitmap)
     }
 
     companion object DiffCallback: DiffUtil.ItemCallback<Wallpaper>() {
@@ -75,12 +64,12 @@ class Adapter(): ListAdapter<Wallpaper, Adapter.ViewHolder>(DiffCallback) {
         }
 
         override fun areContentsTheSame(oldItem: Wallpaper, newItem: Wallpaper): Boolean {
-            return oldItem.imageId == newItem.imageId //&& oldItem.loaded == newItem.loaded
+            return oldItem.imageId == newItem.imageId
         }
 
     }
 
-    class Details: ItemDetailsLookup.ItemDetails<Long>() {
+    class Details: ItemDetailsLookup.ItemDetails<String>() {
         var pos: Int = -1
         var key: String = "1"
 
@@ -88,8 +77,8 @@ class Adapter(): ListAdapter<Wallpaper, Adapter.ViewHolder>(DiffCallback) {
             return pos
         }
 
-        override fun getSelectionKey(): Long {
-            return key.toLong()
+        override fun getSelectionKey(): String {
+            return key
         }
 
         override fun inSelectionHotspot(e: MotionEvent): Boolean {
@@ -98,26 +87,20 @@ class Adapter(): ListAdapter<Wallpaper, Adapter.ViewHolder>(DiffCallback) {
     }
 
     class KeyProvider(private val adapter: Adapter):
-        ItemKeyProvider<Long>(SCOPE_CACHED) {
+        ItemKeyProvider<String>(SCOPE_CACHED) {
 
-        override fun getKey(position: Int): Long {
-            return adapter.getItemId(position)
+        override fun getKey(position: Int): String {
+            return adapter.getItemKey(position)
         }
 
-        override fun getPosition(key: Long): Int {
-            var i = 0
-            while(true) {
-                if (adapter.getItemId(i) == key) {
-                    return i
-                }
-                i++
-            }
+        override fun getPosition(key: String): Int {
+            return adapter.currentList.mapIndexed{idx, wp -> wp.imageId to idx}.toMap()[key]!!
         }
     }
 
 
-    class DetailsLookup(private val recyclerView: RecyclerView): ItemDetailsLookup<Long>() {
-        override fun getItemDetails(e: MotionEvent): ItemDetails<Long>? {
+    class DetailsLookup(private val recyclerView: RecyclerView): ItemDetailsLookup<String>() {
+        override fun getItemDetails(e: MotionEvent): ItemDetails<String>? {
             val view = recyclerView.findChildViewUnder(e.x, e.y)
             if (view != null) {
                 val viewHolder = recyclerView.getChildViewHolder(view) as ViewHolder
@@ -125,6 +108,22 @@ class Adapter(): ListAdapter<Wallpaper, Adapter.ViewHolder>(DiffCallback) {
             }
             return null
         }
+    }
+
+    fun getSingleSelection(): Wallpaper {
+        lateinit var selectedWp: Wallpaper
+        tracker.selection.forEach {
+            selectedWp = getItem(currentList.mapIndexed{idx, wp -> wp.imageId to idx}.toMap()[it]!!)
+        }
+        return selectedWp
+    }
+
+    fun getMultipleSelection(): List<Wallpaper> {
+        val list = mutableListOf<Wallpaper>()
+        tracker.selection.forEach {
+            list.add(getItem(currentList.mapIndexed{idx, wp -> wp.imageId to idx}.toMap()[it]!!))
+        }
+        return list
     }
 
 }

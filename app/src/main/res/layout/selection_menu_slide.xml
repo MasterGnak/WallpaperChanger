@@ -2,27 +2,49 @@
 <layout xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
         xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
-        <variable name="wallpaper" type="com.example.wallpaperchanger.network.Wallpaper"/>
-        <variable name="bitmap" type="android.graphics.Bitmap"/>
+
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/menu_background">
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/clearSelection"
+                android:text="@string/add_to_collection"
+                android:gravity="center"
+                android:textSize="@dimen/text_size"
+                android:layout_marginTop="@dimen/small"
+                android:id="@+id/addToCollection"/>
         <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                android:text="@string/clear_selection"
+                android:gravity="center"
+                android:textSize="@dimen/text_size"
+                android:layout_marginTop="@dimen/small"
+                android:id="@+id/clearSelection"/>
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/addToCollection"
                 android:text="@string/set_as_wp"
                 android:gravity="center"
                 android:textSize="@dimen/text_size"
-                android:layout_marginTop="8dp"
-                android:id="@+id/setAsWp"/>
+                android:id="@+id/setAsWp"
+                android:layout_marginTop="@dimen/small"/>
         <Space
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/menu_height"
+                android:layout_height="@dimen/small"
                 app:layout_constraintTop_toBottomOf="@+id/setAsWp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"/>

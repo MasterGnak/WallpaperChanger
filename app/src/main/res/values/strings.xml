@@ -3,4 +3,14 @@
     <string name="set_as_wp">Установить как обои</string>
     <string name="ready">Готово</string>
     <string name="query_hint">Поиск...</string>
+    <string name="add_to_collection">Добавить в коллекцию</string>
+    <string name="clear_selection">Очистить выделение</string>
+    <string name="search">Поиск</string>
+    <string name="collection">Коллекция</string>
+    <string name="remove_from_collection">Убрать из коллекции</string>
+    <string name="title_switch_preference">Включить автоматическое обновление обоев</string>
+    <string name="title_list_preference">Какой список использовать для обновления?</string>
+    <string name="title_frequency_list_preference">С какой частотой обновлять обои\n(в часах)?</string>
+    <string name="summary_list_preference">Для обновления используется %s</string>
+    <string name="settings">Настройки</string>
 </resources>

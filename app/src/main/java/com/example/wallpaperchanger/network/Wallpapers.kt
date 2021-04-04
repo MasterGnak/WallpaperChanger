@@ -1,98 +1,87 @@
 package com.example.wallpaperchanger.network
 
-
-import android.content.Context
-import android.graphics.drawable.Drawable
-import android.util.Log
-import androidx.core.net.toUri
-import androidx.room.ColumnInfo
+import android.net.Uri
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.target.Target
-import com.bumptech.glide.request.transition.Transition
+import com.example.wallpaperchanger.dirPath
 import com.squareup.moshi.*
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.withContext
+import java.io.File
 import java.lang.UnsupportedOperationException
 
-data class NetworkWallpaper (
+data class NetworkWallpaper(
     val imageId: String,
     val contentUrl: String
-    ) {
+) {
 
 }
 
-data class Wallpaper (
+data class Wallpaper(
     val imageId: String,
-    val contentUrl: String
-        ) {
-    var loaded: Boolean? = null
+    val url: String
+) {
+    override fun equals(other: Any?): Boolean {
+        return when (other) {
+            is EntityWallpaper -> imageId == other.imageId
+            is CollectionWallpaper -> imageId == other.imageId
+            else -> super.equals(other)
+        }
+    }
 }
-
 
 @Entity(tableName = "wallpaper_table")
 data class EntityWallpaper(
     @PrimaryKey
     val imageId: String,
-
-    @ColumnInfo
-    val contentUrl: String
-)
-
-fun List<NetworkWallpaper>.asEntityWallpapers(): List<EntityWallpaper> {
-    return map {
-        EntityWallpaper (
-            imageId = it.imageId,
-            contentUrl = it.contentUrl
-                )
+    val url: String
+) {
+    override fun equals(other: Any?): Boolean {
+        return when (other) {
+            is Wallpaper -> imageId == other.imageId
+            is CollectionWallpaper -> imageId == other.imageId
+            else -> super.equals(other)
+        }
     }
 }
 
-fun List<EntityWallpaper>.asWallpaper(): List<Wallpaper> {
-    return this.map {
+@Entity(tableName = "collection_table")
+data class CollectionWallpaper(
+    @PrimaryKey
+    val imageId: String,
+    val url: String
+) {
+    override fun equals(other: Any?): Boolean {
+        return when (other) {
+            is Wallpaper -> imageId == other.imageId
+            is EntityWallpaper -> imageId == other.imageId
+            else -> super.equals(other)
+        }
+    }
+}
+
+fun List<EntityWallpaper>.asWallpapers(): List<Wallpaper> {
+    return map {
         Wallpaper(
             imageId = it.imageId,
-            contentUrl = it.contentUrl
+            url = it.url
         )
     }
 }
 
-fun NetworkWallpaper.asEntityWallpaper(): EntityWallpaper {
-    return EntityWallpaper (
-        imageId = this.imageId,
-        contentUrl = this.contentUrl
-    )
-}
-
-
-fun NetworkWallpaper.asWallpaper(): Wallpaper {
-    return Wallpaper(
-        imageId = this.imageId,
-        contentUrl = this.contentUrl
-    )
-}
-
-fun MutableList<Wallpaper>.asEntityWps(): List<EntityWallpaper> {
-    return this.map {
-        EntityWallpaper(
+fun List<CollectionWallpaper>.asWallpapersC(): List<Wallpaper> {
+    return map {
+        Wallpaper(
             imageId = it.imageId,
-            contentUrl = it.contentUrl
+            url = it.url
         )
+
     }
 }
 
 
 class WallpaperJsonAdapter {
 
-    val arrayKey = JsonReader.Options.of("value")
-    val itemKeys = JsonReader.Options.of("imageId", "contentUrl")
+    private val arrayKey = JsonReader.Options.of("value")
+    private val itemKeys = JsonReader.Options.of("imageId", "contentUrl")
 
     @FromJson
     fun fromJson(reader: JsonReader): List<NetworkWallpaper> {
