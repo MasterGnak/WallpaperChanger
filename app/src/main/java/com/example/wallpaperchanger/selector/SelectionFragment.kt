@@ -2,36 +2,24 @@ package com.example.wallpaperchanger.selector
 
 import android.animation.ObjectAnimator
 import android.app.Activity
-import android.app.WallpaperManager
 import android.content.Context.MODE_PRIVATE
-import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Log
-import android.util.TypedValue
-import androidx.fragment.app.Fragment
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import androidx.core.view.doOnPreDraw
-import androidx.core.view.marginBottom
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.selection.SelectionPredicates
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.selection.StorageStrategy
-import com.bumptech.glide.Glide
 import com.example.wallpaperchanger.Adapter
-import com.example.wallpaperchanger.MainActivity
 import com.example.wallpaperchanger.R
 import com.example.wallpaperchanger.WpApplication
 import com.example.wallpaperchanger.databinding.SelectionFragmentBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class SelectionFragment : Fragment() {
 
@@ -61,7 +49,6 @@ class SelectionFragment : Fragment() {
         val hidePartM = ObjectAnimator.ofFloat(menu, "translationY", partPx, fullPx).apply { duration = 500 }
         preHideM.start()
 
-        val wpManager = WallpaperManager.getInstance(context)
         val imm = requireNotNull(activity).getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         val sharedPrefs = requireContext().getSharedPreferences("queryPrefs", MODE_PRIVATE)
         binding.editQuery.setText(sharedPrefs.getString("queryText", null))
@@ -138,6 +125,10 @@ class SelectionFragment : Fragment() {
                 sharedPrefs.edit().putString("queryText", text).apply()
                 viewModel.downloadWp(text)
             }
+        }
+
+        binding.menuButton.setOnClickListener {
+            requireActivity().findViewById<DrawerLayout>(R.id.drawerLayout).openDrawer(Gravity.LEFT)
         }
 
         return binding.root

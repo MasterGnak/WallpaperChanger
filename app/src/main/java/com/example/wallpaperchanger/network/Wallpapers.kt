@@ -1,12 +1,11 @@
 package com.example.wallpaperchanger.network
 
-import android.net.Uri
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.wallpaperchanger.dirPath
-import com.squareup.moshi.*
-import java.io.File
-import java.lang.UnsupportedOperationException
+import com.squareup.moshi.FromJson
+import com.squareup.moshi.JsonReader
+import com.squareup.moshi.JsonWriter
+import com.squareup.moshi.ToJson
 
 data class NetworkWallpaper(
     val imageId: String,

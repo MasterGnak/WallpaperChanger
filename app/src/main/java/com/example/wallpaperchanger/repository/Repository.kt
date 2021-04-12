@@ -1,6 +1,7 @@
 package com.example.wallpaperchanger.repository
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.work.Data
@@ -31,6 +32,7 @@ class Repository(private val database: ImageDatabase, private val context: Conte
 
     override suspend fun downloadWallpapers(query: String) {
         clear()
+        Log.i("loading", "cleared")
         val wallpapers = Api.retrofitService.getImages(query, "Wallpaper", "Tall", 36)
         val entityWallpapers = wallpapers.map { EntityWallpaper(it.imageId, it.contentUrl) }
         database.imageDao.insertAll(entityWallpapers)
@@ -53,10 +55,12 @@ class Repository(private val database: ImageDatabase, private val context: Conte
     }
 
     override suspend fun clear() {
-        withContext(Dispatchers.IO) {
-            val list = database.imageDao.getAll().value
-            val collection = database.imageDao.getAllC().value
-            list?.minus(collection)?.forEach {
+        withContext(Dispatchers.Default) {
+            val list = database.imageDao.getAllNotLive()
+            val collection = database.imageDao.getAllCNotLive()
+            val deletion = list.minus(collection)
+            Log.i("loading", "size to delete ${deletion.size}")
+            deletion.forEach {
                 File(dirPath, (it as EntityWallpaper).imageId).delete()
             }
             database.imageDao.clear()

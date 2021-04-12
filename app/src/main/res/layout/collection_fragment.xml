@@ -41,6 +41,13 @@
                     android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
                     app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                     app:layout_scrollFlags="scroll|enterAlways">
+                <ImageView
+                        android:id="@+id/menu_button"
+                        android:src="@drawable/ic_menu"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:paddingEnd="@dimen/small"/>
                 <TextView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"

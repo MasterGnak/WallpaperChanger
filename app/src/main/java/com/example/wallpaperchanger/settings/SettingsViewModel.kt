@@ -4,7 +4,10 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.preference.PreferenceManager
-import androidx.work.*
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.example.wallpaperchanger.R
 import com.example.wallpaperchanger.work.FREQ
 import com.example.wallpaperchanger.work.LIST
@@ -27,16 +30,9 @@ class SettingsViewModel(application: Application): AndroidViewModel(application)
     fun setupWork(context: Context) {
         if (switch) {
             val inputData = workDataOf(LIST to list)
-            val constraints = Constraints.Builder()
-                .setRequiresBatteryNotLow(false)
-                .setRequiresCharging(false)
-                .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
-                .setRequiresDeviceIdle(false)
-                .build()
             val repeatingRequest = PeriodicWorkRequestBuilder<WpWorker>(freq, TimeUnit.HOURS)
-                .setConstraints(constraints)
                 .setInputData(inputData)
-                .setInitialDelay(1, TimeUnit.HOURS)
+                .setInitialDelay(1, TimeUnit.MINUTES)
                 .build()
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 WpWorker.WORK_NAME,

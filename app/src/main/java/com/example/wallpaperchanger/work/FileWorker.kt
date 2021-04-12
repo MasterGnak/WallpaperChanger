@@ -7,23 +7,24 @@ import androidx.core.net.toUri
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.bumptech.glide.Glide
+import com.example.wallpaperchanger.ServiceLocator
 import com.example.wallpaperchanger.dirPath
 import java.io.File
 import java.io.FileOutputStream
-import java.lang.Exception
 
 class FileWorker(appContext: Context, params: WorkerParameters) : Worker(appContext, params) {
 
     private val dir = File(dirPath)
+    private val repository = ServiceLocator.provideRepository(appContext)
 
     companion object {
         const val WORK_NAME = "FileWorker"
     }
 
     override fun doWork(): Result {
-        val wallpapers = inputData.keyValueMap
+        val wallpapers = repository.getWallpapers()
         wallpapers.forEach {
-            downloadImage(it.key, it.value as String)
+            downloadImage(it.imageId, it.url)
         }
         return Result.success()
     }

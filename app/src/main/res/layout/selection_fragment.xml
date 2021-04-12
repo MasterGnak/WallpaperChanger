@@ -46,18 +46,31 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
+                    <ImageView
+                            android:id="@+id/menu_button"
+                            android:src="@drawable/ic_menu"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            android:paddingEnd="@dimen/small"/>
                     <EditText
                             android:id="@+id/edit_query"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:background="@null"
+                            android:gravity="center_vertical"
                             android:textColor="@color/secondaryColor"
                             android:hint="@string/query_hint"
                             android:textColorHint="@color/secondaryTextColor"
                             android:textCursorDrawable="@null"
                             app:layout_constraintEnd_toStartOf="@+id/confirm_query"
-                            app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent" android:layout_marginEnd="8dp"/>
+                            app:layout_constraintStart_toEndOf="@+id/menu_button"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            android:layout_marginEnd="@dimen/small"/>
                     <TextView
                             android:id="@+id/confirm_query"
                             android:layout_width="wrap_content"
@@ -65,8 +78,10 @@
                             android:text="@string/ready"
                             android:gravity="center"
                             android:visibility="gone"
-                            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" android:layout_marginEnd="16dp"/>
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            android:layout_marginEnd="16dp"/>
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
             </androidx.appcompat.widget.Toolbar>
